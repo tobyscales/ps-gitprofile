@@ -116,7 +116,7 @@ if ($env:isConnected) {
     #get-childitem
     #$gitRepo = "https://github.com/" + $env:gitProfile.substring(34, $env:gitProfile.indexOf("/master") - 34) + ".git" 
     #new-runspace -runspacename "Git Clone" -scriptblock { git clone $gitRepo }
-    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
+    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
     #New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here }
 }
 if (-not $isAdmin) {
@@ -131,13 +131,13 @@ if (-not $isAdmin) {
     # if you want to add functions you can added scripts to your
     # powershell profile functions directory or you can inline them
     # in this file. Ignoring the dot source of any tests
-    write-host "Loading functions..."
+    write-host "Loaded functions."
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
-    Resolve-Path $here\functions\*.ps1 | 
-    Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
-    ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
+    #Resolve-Path $here\functions\*.ps1 | 
+    #Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
+    #ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
 } 
 
 
