@@ -26,11 +26,11 @@ function global:Invoke-RequiredFunctions {
     
         foreach ($file in $files) {
             try {
-                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
- #               $script = ((New-Object System.Net.WebClient).DownloadString($file)) #-ErrorAction Stop
+                #invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+                $script = ((New-Object System.Net.WebClient).DownloadString($file)) #-ErrorAction Stop
  #               $Script -replace '^\s*function\s+((?!global[:]|local[:]|script[:]|private[:])[\w-]+)','function Global:$1'
  #               write-host -foregroundcolor green $script
- #               .([scriptblock]::Create($script)) 
+                .([scriptblock]::Create($script)) 
                 "Loaded '$($file)'"
             } catch {
                 throw "Unable to download '$($file.path)'"
