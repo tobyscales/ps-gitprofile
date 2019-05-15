@@ -1,4 +1,4 @@
-function global:Run-kubectl {
+function Run-kubectl {
     . kubectl $args
 }
 function Run-kubedescribe {
