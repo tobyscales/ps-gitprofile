@@ -109,6 +109,9 @@ if ($env:isConnected) {
     $getGFURL = "https://raw.githubusercontent.com/tescales/powershell-gitprofile/master/functions/Get-GitFiles.ps1"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
 
+    $invokeRFURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Invoke-RequiredFunctions.ps1"
+    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
+
     $gitOwner = split-path ($env:gitProfile)
     $gitRepo = split-path ($env:gitProfile) -leaf
     write-host -ForegroundColor yellow "Cloning from $gitRepo..."
@@ -135,13 +138,13 @@ if (-not $isAdmin) {
     #$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
     #. Import-Component "C:\Users\toscal\OneDrive - Microsoft\Repos\Github\ps-gitprofile\functions" -type PS -recurse
-    #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path 'functions/!required'
+    Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path 'functions/!required'
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
     Resolve-Path $here\functions\*.ps1 | 
     Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
-    ForEach-Object { invoke-expression ($_.ProviderPath -replace ' ','` '); write-host ". $($_.ProviderPath)" }
+    ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
 } 
 
 
@@ -159,5 +162,5 @@ $UserBinDir = "$($home)\bin"
 # creates paths to every subdirectory of userprofile\bin
 # adds a transient script dir that I use for experiments
 #$paths = @("$($env:Path)", $TransientScriptDir)
-Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
-$env:Path = [String]::Join("; ", $paths) 
+#Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
+#$env:Path = [String]::Join("; ", $paths) 
