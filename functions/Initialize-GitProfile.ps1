@@ -36,6 +36,8 @@ function global:Initialize-GitProfile {
     #         default { $useDefaultGitProfile = Read-Host "Please enter Y or N" }
     #    }
     # }
+    #write-host "Initialize-GP:  $($myinvocation.commandorigin)"
+    #$myinvocation | fl
 
     while ("Y", "N" -notcontains $configureMachine.toUpper()) {
         $configureMachine = Read-Host "Would you like to configure this machine to always use `n--->$gitProfileURL`nas your PowerShell profile?"
@@ -43,8 +45,8 @@ function global:Initialize-GitProfile {
             "N" { 
                 $global:storeLocalProfile=$false
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
-                #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path functions 
-                Invoke-Expression (Get-GitProfile $gitProfileURL)
+                Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
+                . (Get-GitProfile $gitProfileURL)
              }
             "Y" {
                 Set-GitProfile $profileURL

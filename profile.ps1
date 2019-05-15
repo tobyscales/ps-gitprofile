@@ -14,8 +14,8 @@ function global:Update-GitProfile {
 
     #$ErrorActionPreference = 'SilentlyContinue'
     if ($PSVersionTable.PSVersion.Major -ge 6) { $env:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $env:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
-    write-host "MyInvocation"
-    $MyInvocation | fl
+    #write-host "profile:  $($myinvocation.commandorigin)"
+    #$myinvocation | fl
 
     if ($env:isConnected) { 
         Write-host -ForegroundColor Green "Connection detected."
@@ -27,7 +27,7 @@ function global:Update-GitProfile {
         else {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-            Invoke-Expression $env:LocalGitProfile
+            . $env:LocalGitProfile
         }
     }
     else {
@@ -38,7 +38,7 @@ function global:Update-GitProfile {
         }
 
         & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-        Invoke-Expression $env:LocalGitProfile
+        . $env:LocalGitProfile
     }
 }
 
