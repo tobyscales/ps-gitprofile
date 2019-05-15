@@ -21,7 +21,7 @@ function Invoke-RequiredFunctions {
         $directories = $objects | where-object {$_.type -eq "dir"}
         
         $directories | ForEach-Object { 
-            Invoke-RequiredFunctions -gitProfile $gitProfile -Path $_.path
+            Invoke-RequiredFunctions -owner $owner -repository $Repository -Path $_.path
         }
     
         foreach ($file in $files) {
