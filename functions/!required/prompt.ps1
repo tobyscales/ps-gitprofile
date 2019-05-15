@@ -6,7 +6,7 @@
 function Get-Time { return $(get-date | foreach { $_.ToLongTimeString() } ) }
 
 # This is function is called by convention in PowerShell
- function global:prompt { 
+ function prompt { 
    $console = $host.ui.RawUI
    
    # our theme 
