@@ -1,7 +1,7 @@
 if (-not $env:gitProfile) { $env:gitProfile = "tescales/ps-gitprofile" }
 
 function global:Update-GitProfile {
-    param([Parameter( Mandatory, ValueFromPipeline = $true)]
+    param([Parameter(ValueFromPipeline = $true)]
         [String[]]$gitProfile=$env:gitProfile)
 
     $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Initialize-GitProfile.ps1"
