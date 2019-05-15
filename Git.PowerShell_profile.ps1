@@ -102,7 +102,7 @@ switch ($true) {
 
 write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
 
-if ($env:isConnected) {
+if ($env:isConnected -and $storeLocalProfile) {
     $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
     
@@ -116,7 +116,7 @@ if ($env:isConnected) {
     #get-childitem
     #$gitRepo = "https://github.com/" + $env:gitProfile.substring(34, $env:gitProfile.indexOf("/master") - 34) + ".git" 
     #new-runspace -runspacename "Git Clone" -scriptblock { git clone $gitRepo }
-    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
     #New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here }
 }
 if (-not $isAdmin) {

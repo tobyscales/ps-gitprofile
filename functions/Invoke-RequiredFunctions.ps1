@@ -6,7 +6,7 @@
 .EXAMPLE
 
 #>
-function Invoke-RequiredFunctions {
+function global:Invoke-RequiredFunctions {
     Param(
         [string]$Owner,
         [string]$Repository,

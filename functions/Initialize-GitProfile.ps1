@@ -41,6 +41,7 @@ function global:Initialize-GitProfile {
         $configureMachine = Read-Host "Would you like to configure this machine to always use `n--->$gitProfileURL`nas your PowerShell profile?"
         switch ($configureMachine.toUpper()) {
             "N" { 
+                $global:storeLocalProfile=$false
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path functions 
                 Invoke-Expression (Get-GitProfile $gitProfileURL)
