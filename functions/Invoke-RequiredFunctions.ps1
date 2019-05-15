@@ -8,16 +8,17 @@
 #>
 function Invoke-RequiredFunctions {
     Param(
-        [string]$gitProfile,
+        [string]$Owner,
+        [string]$Repository,
         [string]$Path
         )
     
         $baseUri = "https://api.github.com/"
-        $args = "repos/$gitProfile/contents/$Path"
+        $args = "repos/$Owner/$Repository/contents/$Path"
         $wr = Invoke-WebRequest -Uri $($baseuri+$args)
         $objects = $wr.Content | ConvertFrom-Json
-        $files = $objects | Where-Object {$_.type -eq "file"} | Select-object -exp download_url
-        $directories = $objects | Where-Object {$_.type -eq "dir"}
+        $files = $objects | where-object {$_.type -eq "file"} | Select-object -exp download_url
+        $directories = $objects | where-object {$_.type -eq "dir"}
         
         $directories | ForEach-Object { 
             Invoke-RequiredFunctions -gitProfile $gitProfile -Path $_.path
