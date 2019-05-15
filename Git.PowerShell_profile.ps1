@@ -132,7 +132,7 @@ if (-not $isAdmin) {
     # powershell profile functions directory or you can inline them
     # in this file. Ignoring the dot source of any tests
     write-host "Re-loading functions."
-    Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path functions
+    Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path 'functions/!required'
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
