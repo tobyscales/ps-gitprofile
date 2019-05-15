@@ -141,7 +141,7 @@ if (-not $isAdmin) {
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
     Resolve-Path $here\functions\*.ps1 | 
     Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
-    ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
+    ForEach-Object { invoke-expression ($_.ProviderPath -replace ' ','` '); write-host ". $($_.ProviderPath)" }
 } 
 
 
