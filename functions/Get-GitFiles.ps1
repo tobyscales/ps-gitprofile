@@ -31,7 +31,7 @@ function Get-GitFiles {
         if (-not (Test-Path $DestinationPath)) {
             # Destination path does not exist, let's create it
             try {
-                New-Item -Path $DestinationPath -ItemType Directory -ErrorAction Stop
+                New-Item -Path $DestinationPath -ItemType Directory -ErrorAction Stop | out-file $null
             } catch {
                 throw "Could not create path '$DestinationPath'!"
             }

@@ -127,7 +127,7 @@ if ($global:isConnected -and $global:persistProfile) {
     }
     New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
 }
-if (-not $isAdmin) {
+if ((-not $isAdmin) -and (-not $global:persistProfile)) {
 
     #used for when cloud-shell is mapped as a drive; wish there was a better way around this!
     # (can't use unblock-file because SMB shares don't support FileStream Zone.Identifiers)
