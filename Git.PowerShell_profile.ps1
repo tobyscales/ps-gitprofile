@@ -142,7 +142,7 @@ if ((-not $isAdmin) -and (-not $global:persistProfile)) {
     #write-host "Re-loading functions."
     #$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
-    #. Import-Component "C:\Users\toscal\OneDrive - Microsoft\Repos\Github\ps-gitprofile\functions" -type PS -recurse
+    #. Import-Component "(split-path $profile)\functions" -type PS -recurse
 
     $baseUri = "https://api.github.com/"
         $args = "repos/$gitOwner/$gitRepo/contents/functions/!required"
