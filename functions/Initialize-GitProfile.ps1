@@ -45,7 +45,7 @@ function global:Initialize-GitProfile {
             "N" { 
                 $global:storeLocalProfile=$false
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
-                Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
+                #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
                 . (Get-GitProfile $gitProfileURL)
              }
             "Y" {
@@ -67,13 +67,13 @@ function global:Initialize-GitProfile {
                                 '$env:gitProfile'      = "$gitProfile"
                                 '$env:storagePath'     = "$storageAcct\$storageShare"
                                 '$env:storageKey'      = $storageKey
-                                '$env:LocalGitProfile' = "$(split-path $profile)\Git.PowerShell_profile.ps1"
+                                '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
                             }
                         }
                         "N" { 
                             $envVars = [ordered]@{
                                 '$env:gitProfile'      = "$gitProfile"
-                                '$env:LocalGitProfile' = "$(split-path $profile)/Git.PowerShell_profile.ps1"
+                                '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
                             }
                         }
                         default { $useCloudShell = Read-Host "Please enter Y or N" }
@@ -89,7 +89,7 @@ function global:Initialize-GitProfile {
 
                 & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-                Invoke-Expression $env:LocalGitProfile            #see above
+                . $env:LocalGitProfile            #see above
             }
             default { $configureMachine = Read-Host "Please enter Y or N" }
         }

@@ -1,6 +1,6 @@
 if (-not $env:gitProfile) { $env:gitProfile = "tescales/ps-gitprofile" }
 
-function global:Update-GitProfile {
+function Update-GitProfile {
     param([Parameter(ValueFromPipeline = $true)]
         [String[]]$gitProfile=$env:gitProfile)
 
