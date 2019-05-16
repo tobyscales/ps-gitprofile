@@ -13,11 +13,11 @@ function Update-GitProfile {
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
 
     #$ErrorActionPreference = 'SilentlyContinue'
-    if ($PSVersionTable.PSVersion.Major -ge 6) { $env:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $env:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
+    if ($PSVersionTable.PSVersion.Major -ge 6) { $global:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $global:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
     #write-host "profile:  $($myinvocation.commandorigin)"
     #$myinvocation | fl
 
-    if ($env:isConnected) { 
+    if ($global:isConnected) { 
         Write-host -ForegroundColor Green "Running in online mode."
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))
 
@@ -41,7 +41,7 @@ function Update-GitProfile {
     return $true
 }
 
-if(Update-GitProfile) { . $env:LocalGitProfile } else { . (
+if(Update-GitProfile) { $global:persistProfile=$true; . $env:LocalGitProfile } else { $global:persistProfile=$false; . (
     [scriptblock]::Create(
         (Get-GitProfile $global:gitProfileURL)
     )

@@ -102,7 +102,7 @@ switch ($true) {
 
 write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
 
-if ($env:isConnected) {
+if ($global:isConnected -and $global:persistProfile) {
     $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
     
