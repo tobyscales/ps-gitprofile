@@ -28,25 +28,14 @@ function global:Initialize-GitProfile {
 
     $envVars = @{ }
 
-    # while ("Y", "N" -notcontains $useDefaultGitProfile.toUpper()) {
-    #     $useDefaultGitProfile = Read-Host "Would you like to use the default GitProfile `n($gitProfile)?"
-    #     switch ($useDefaultGitProfile.toUpper()) {
-    #         "Y" { }
-    #         "N" { $gitProfile = Read-Host "Paste the Raw Github link to your profile here" }
-    #         default { $useDefaultGitProfile = Read-Host "Please enter Y or N" }
-    #    }
-    # }
-    #write-host "Initialize-GP:  $($myinvocation.commandorigin)"
-    #$myinvocation | fl
-
     while ("Y", "N" -notcontains $configureMachine.toUpper()) {
         $configureMachine = Read-Host "Would you like to configure this machine to always use `n--->$gitProfileURL`nas your PowerShell profile?"
         switch ($configureMachine.toUpper()) {
             "N" { 
-                $global:storeLocalProfile=$false
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
                 . (Get-GitProfile $gitProfileURL)
+                return $false
              }
             "Y" {
                 Set-GitProfile $profileURL
@@ -89,7 +78,7 @@ function global:Initialize-GitProfile {
 
                 & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-                . $env:LocalGitProfile            #see above
+                return $true
             }
             default { $configureMachine = Read-Host "Please enter Y or N" }
         }

@@ -40,5 +40,4 @@ function Update-GitProfile {
     }
 }
 
-Update-GitProfile
-. $env:LocalGitProfile
+if(Update-GitProfile) { . $env:LocalGitProfile }
