@@ -101,6 +101,8 @@ switch ($true) {
 } 
 
 write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
+$gitOwner = split-path ($env:gitProfile)
+$gitRepo = split-path ($env:gitProfile) -leaf
 
 if ($global:isConnected -and $global:persistProfile) {
     $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
@@ -109,8 +111,6 @@ if ($global:isConnected -and $global:persistProfile) {
     $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
 
-    $gitOwner = split-path ($env:gitProfile)
-    $gitRepo = split-path ($env:gitProfile) -leaf
     write-host -ForegroundColor yellow "Loading functions from $gitRepo..."
     set-location -Path "$here"
 
@@ -143,7 +143,23 @@ if ((-not $isAdmin) -and (-not $global:persistProfile)) {
     #$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
     #. Import-Component "C:\Users\toscal\OneDrive - Microsoft\Repos\Github\ps-gitprofile\functions" -type PS -recurse
-    Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
+
+    $baseUri = "https://api.github.com/"
+        $args = "repos/$Owner/$Repository/contents/functions/!required"
+        $wr = Invoke-WebRequest -Uri $($baseuri+$args)
+        $objects = $wr.Content | ConvertFrom-Json
+        $files = $objects | where-object {$_.type -eq "file"} | Select-object -exp download_url
+
+        foreach ($file in $files) {
+            try {
+                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+                "Loaded '$($file)'"
+            } catch {
+                throw "Unable to download '$($file.path)'"
+            }
+        }
+
+    #Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
