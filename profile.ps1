@@ -18,7 +18,7 @@ function Update-GitProfile {
     #$myinvocation | fl
 
     if ($env:isConnected) { 
-        Write-host -ForegroundColor Green "Connection detected."
+        Write-host -ForegroundColor Green "Running in online mode."
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))
 
         if (-not (test-path $home\.gitprofile\secrets.ps1)) {
@@ -27,7 +27,6 @@ function Update-GitProfile {
         else {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-            . $env:LocalGitProfile
         }
     }
     else {
@@ -38,8 +37,8 @@ function Update-GitProfile {
         }
 
         & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-        . $env:LocalGitProfile
     }
 }
 
 Update-GitProfile
+. $env:LocalGitProfile
