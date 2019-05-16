@@ -34,7 +34,11 @@ function global:Initialize-GitProfile {
             "N" { 
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
-                . (Get-GitProfile $gitProfileURL)
+                . (
+                    [scriptblock]::Create(
+                        [io.file]::ReadAllText((Get-GitProfile $gitProfileURL))
+                    )
+                )
                 return $false
              }
             "Y" {
