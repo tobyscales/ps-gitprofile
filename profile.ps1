@@ -14,8 +14,6 @@ function Update-GitProfile {
 
     #$ErrorActionPreference = 'SilentlyContinue'
     if ($PSVersionTable.PSVersion.Major -ge 6) { $global:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $global:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
-    #write-host "profile:  $($myinvocation.commandorigin)"
-    #$myinvocation | fl
 
     if ($global:isConnected) { 
         Write-host -ForegroundColor Green "Running in online mode."
@@ -27,6 +25,7 @@ function Update-GitProfile {
         else {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
+            return $true
         }
     }
     else {
@@ -37,8 +36,8 @@ function Update-GitProfile {
         }
 
         & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
+        return $true
     }
-    return $true
 }
 
 if(Update-GitProfile) { $global:persistProfile=$true; . $env:LocalGitProfile } else { $global:persistProfile=$false; . (
