@@ -5,7 +5,7 @@ function Update-GitProfile {
         [String[]]$gitProfile=$env:gitProfile)
 
     $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Initialize-GitProfile.ps1"
-    $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
+    $global:gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
 
     #TODO: use runspaces for faster loading?
     #$runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
@@ -22,7 +22,7 @@ function Update-GitProfile {
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))
 
         if (-not (test-path $home\.gitprofile\secrets.ps1)) {
-            Initialize-GitProfile $gitProfile
+            return (Initialize-GitProfile $gitProfile)
         }
         else {
             & "$home\.gitprofile\secrets.ps1"
@@ -38,6 +38,11 @@ function Update-GitProfile {
 
         & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
     }
+    return $true
 }
 
-if(Update-GitProfile) { . $env:LocalGitProfile }
+if(Update-GitProfile) { . $env:LocalGitProfile } else { . (
+    [scriptblock]::Create(
+        (Get-GitProfile $global:gitProfileURL)
+    )
+) }
