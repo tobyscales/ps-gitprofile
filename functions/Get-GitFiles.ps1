@@ -23,7 +23,7 @@ function Get-GitFiles {
         
         $directories | ForEach-Object { 
             if ($_.name -ne "!required") {
-            Get-GitFiles -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath $($DestinationPath+$_.name)
+            Get-GitFiles -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath (join-path $DestinationPath -childpath $_.name)
             }
         }
     
@@ -41,7 +41,7 @@ function Get-GitFiles {
             $fileDestination = Join-Path $DestinationPath (Split-Path $file -Leaf)
             try {
                 Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop 
-                "Saved '$($file)' to '$fileDestination'"
+                write-verbose "Saved '$($file)' to '$fileDestination'"
             } catch {
                 throw "Unable to download '$($file.path)'"
             }
