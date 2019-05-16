@@ -27,11 +27,6 @@ function global:Invoke-RequiredFunctions {
         foreach ($file in $files) {
             try {
                 invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                #$script = ((New-Object System.Net.WebClient).DownloadString($file)) #-ErrorAction Stop
-                #$sblock = ([scriptblock]::Create($script))
- #               $Script -replace '^\s*function\s+((?!global[:]|local[:]|script[:]|private[:])[\w-]+)','function Global:$1'
-                #write-host -foregroundcolor green $sblock
-                #. $sblock
                 "Loaded '$($file)'"
             } catch {
                 throw "Unable to download '$($file.path)'"

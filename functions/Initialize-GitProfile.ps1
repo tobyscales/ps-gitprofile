@@ -36,7 +36,7 @@ function global:Initialize-GitProfile {
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
                 . (
                     [scriptblock]::Create(
-                        [io.file]::ReadAllText((Get-GitProfile $gitProfileURL))
+                        (Get-GitProfile $gitProfileURL)
                     )
                 )
                 return $false
