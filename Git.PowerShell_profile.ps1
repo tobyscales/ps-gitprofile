@@ -118,6 +118,13 @@ if ($global:isConnected -and $global:persistProfile) {
     #new-runspace -runspacename "Git Clone" -scriptblock { git clone $gitRepo }
 
     Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
+    foreach ($file in Get-ChildItem $here\functions\*.ps1 -recurse) {
+        . (
+            [scriptblock]::Create(
+                [io.file]::ReadAllText($file)
+            )
+        )
+    }
     New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
 }
 if (-not $isAdmin) {
@@ -136,20 +143,14 @@ if (-not $isAdmin) {
     #$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
     #. Import-Component "C:\Users\toscal\OneDrive - Microsoft\Repos\Github\ps-gitprofile\functions" -type PS -recurse
-    #Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
+    Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
     #Resolve-Path $here\functions\!required\*.ps1 | 
     #Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
     #ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
-    foreach ($file in Get-ChildItem $here\functions\*.ps1 -recurse) {
-        . (
-            [scriptblock]::Create(
-                [io.file]::ReadAllText($file)
-            )
-        )
-    }
+    
 } 
 
 
