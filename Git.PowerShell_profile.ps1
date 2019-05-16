@@ -106,21 +106,19 @@ if ($env:isConnected) {
     $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
     
-    $getGFURL = "https://raw.githubusercontent.com/tescales/powershell-gitprofile/master/functions/Get-GitFiles.ps1"
+    $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
     Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
-
-    $invokeRFURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Invoke-RequiredFunctions.ps1"
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
 
     $gitOwner = split-path ($env:gitProfile)
     $gitRepo = split-path ($env:gitProfile) -leaf
-    write-host -ForegroundColor yellow "Loading !required functions from $gitRepo..."
+    write-host -ForegroundColor yellow "Loading functions from $gitRepo..."
     set-location -Path "$here"
 
     #$gitRepo = "https://github.com/" + $env:gitProfile.substring(34, $env:gitProfile.indexOf("/master") - 34) + ".git" 
     #new-runspace -runspacename "Git Clone" -scriptblock { git clone $gitRepo }
-    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions\!required -DestinationPath "$here\functions\!required"
-    #New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here }
+
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
+    New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
 }
 if (-not $isAdmin) {
 
@@ -138,14 +136,14 @@ if (-not $isAdmin) {
     #$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
     #. Import-Component "C:\Users\toscal\OneDrive - Microsoft\Repos\Github\ps-gitprofile\functions" -type PS -recurse
-    Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path 'functions/!required'
+    #Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
     #Resolve-Path $here\functions\!required\*.ps1 | 
     #Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
     #ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
-    foreach ($file in Get-ChildItem $here\functions\!required\*.ps1) {
+    foreach ($file in Get-ChildItem $here\functions\*.ps1 -recurse) {
         . (
             [scriptblock]::Create(
                 [io.file]::ReadAllText($file)
@@ -171,3 +169,4 @@ $UserBinDir = "$($home)\bin"
 #$paths = @("$($env:Path)", $TransientScriptDir)
 #Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
 #$env:Path = [String]::Join("; ", $paths) 
+
