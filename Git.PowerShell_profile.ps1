@@ -17,13 +17,17 @@
 #$ErrorActionPreference = 'SilentlyContinue'
 
 #region functions
+function which($name) { Get-Command $name | Select-Object Definition }
+function rm-rf($item) { Remove-Item $item -Recurse -Force }
+function touch($file) { "" | Out-File $file -Encoding ASCII }
+
 function Mount-CloudShell {
-    if ($env:isConnected) {
+    if ($global:isConnected) {
         switch ($true) {
             $isWindows {
                 if (Get-PSDrive -name S) {
                     Write-Verbose "Found S:\ drive."
-                    return $true
+                    return "S:"
                 }
                 else {
                     $acctUser = $env:storagePath.split('.')[0]
@@ -33,17 +37,17 @@ function Mount-CloudShell {
                     try {
                         New-PSDrive -Name S -PSProvider FileSystem -Root "\\$env:storagePath" -Credential $credential -Persist -Scope Global -ErrorAction Stop
                         Write-Verbose "Mapped drive \\$env:storagePath using $($credential.UserName)"
-                        return $true
+                        return "S:"
                     }
                     catch {
                         Write-Host -ForegroundColor Darkred "Error mapping cloudshell drive at $env:storagePath."
-                        return $false
+                        return split-path($env:LocalGitProfile).tostring()
                     }
                 }                
             }
             $isLinux {
                 if (Get-PSDrive -name "cloudshell" -ErrorAction SilentlyContinue) {
-                    return $true
+                    return "$home/cloudshell"
                 }
                 else {
                     $acctUser = $env:storagePath.split('.')[0]
@@ -61,81 +65,119 @@ function Mount-CloudShell {
                         }
                         catch {
                             Write-Host -ForegroundColor DarkRed "Error mapping cloudshell drive at $env:storagePath."
-                            return $false
+                            return split-path($env:LocalGitProfile).tostring()
                         }
                         Write-Verbose "Mapped drive \\$env:storagePath using $($credential.UserName)"
-                        return $true
+                        return "$home/cloudshell"
                     }
                     catch {
                         Write-Host -ForegroundColor Darkred "Error mapping cloudshell drive at $env:storagePath."
-                        return $false
+                        return split-path($env:LocalGitProfile).tostring()
                     }
                 }                
             }
             $IsMacOS {
                 Write-Host "Cloud Shell Mapping not yet enabled for MacOS, sorry."
-                return $false
+                return split-path($env:LocalGitProfile).tostring()
             }
         }    
     }
-    else { return $env:isConnected }
+    else { return $null }
 }
+#endregion functions
 
-#endregion
-
-if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
+$here = ""
 $isAdmin = $false
 
-write-verbose "Loading $env:LocalGitProfile from $here and $($MyInvocation.InvocationName)"
+write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
 
 switch ($true) {
     $isWindows {
         $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-        if ( ($env:storageKey) -and (Mount-CloudShell) ) { $here = "S:" }
     }
     $isLinux { 
         #TODO: $isAdmin = something;
-        if ( ($env:storageKey) -and (Mount-CloudShell) ) { $here = "$home/cloudshell" }
     }
-    $isMacOS { }
+    $isMacOS { 
+        #TODO: $isAdmin = something;
+     }
 } 
 
-write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
 $gitOwner = split-path ($env:gitProfile)
 $gitRepo = split-path ($env:gitProfile) -leaf
 
-if ($global:isConnected -and $global:persistProfile) {
-    $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
-    
-    $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
+switch ($global:isConnected) {
+    $true {
+        $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
 
-    write-host -ForegroundColor yellow "Loading functions from $gitRepo..."
-    set-location -Path "$here"
+        $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
 
-    #$gitRepo = "https://github.com/" + $env:gitProfile.substring(34, $env:gitProfile.indexOf("/master") - 34) + ".git" 
-    #new-runspace -runspacename "Git Clone" -scriptblock { git clone $gitRepo }
+        #env:LocalGitProfile means we're persisting a profile
+        if ($env:LocalGitProfile) {
+            #env:storageKey means we're persisting to cloudshell
+            if ($env:storageKey) { $here = Mount-CloudShell; write-host "Mapped Cloud drive to $here." }
 
-    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
-    foreach ($file in Get-ChildItem $here\functions\*.ps1 -recurse) {
-        . (
-            [scriptblock]::Create(
-                [io.file]::ReadAllText($file)
-            )
-        )
+            write-host -ForegroundColor yellow "Loading functions from $gitRepo..."
+
+            Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
+            foreach ($file in Get-ChildItem $here\functions\*.ps1 -recurse) {
+                . (
+                    [scriptblock]::Create(
+                        [io.file]::ReadAllText($file)
+                    )
+                )
+            }
+            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
+        }
+        else {
+            # Non-persistent function loader
+            $baseUri = "https://api.github.com/"
+            $args = "repos/$gitOwner/$gitRepo/contents/functions/!required"
+            $wr = Invoke-WebRequest -Uri $($baseuri + $args)
+            $objects = $wr.Content | ConvertFrom-Json
+            $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+
+            foreach ($file in $files) {
+                try {
+                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+                    "Loaded '$($file)'"
+                }
+                catch {
+                    throw "Unable to download '$($file.path)'"
+                }
+            }
+        }
     }
-    New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
+    $false {
+        $here = (split-path -$env:LocalGitProfile).tostring()
+    }
 }
-if ((-not $isAdmin) -and (-not $global:persistProfile)) {
 
-    #used for when cloud-shell is mapped as a drive; wish there was a better way around this!
-    # (can't use unblock-file because SMB shares don't support FileStream Zone.Identifiers)
-    # would be ideal --> get-item $here\functions\*.ps1 | Unblock-File
-    Set-ExecutionPolicy Bypass -Scope Process -Force
+write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
+set-location -Path "$here"
 
-    # function loader
-    #
+if (-not $isAdmin) {
+        #used for when cloud-shell is mapped as a drive; wish there was a better way around this!
+        # (can't use unblock-file because SMB shares don't support FileStream Zone.Identifiers)
+        # would be ideal --> get-item $here\functions\*.ps1 | Unblock-File
+        Set-ExecutionPolicy Bypass -Scope Process -Force
+
+        $TransientScriptDir = "$here\scripts"
+        #$UserBinDir = "$($home)\bin"
+    
+        # PATH update
+        #
+        # creates paths to every subdirectory of userprofile\bin
+        # adds a transient script dir that I use for experiments
+        $paths = @("$($env:Path)", $TransientScriptDir)
+        #Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
+        $env:Path = [String]::Join("; ", $paths) 
+    
+    }
+
+    #OLD/FUTURE USE CODE
     # if you want to add functions you can added scripts to your
     # powershell profile functions directory or you can inline them
     # in this file. Ignoring the dot source of any tests
@@ -144,21 +186,6 @@ if ((-not $isAdmin) -and (-not $global:persistProfile)) {
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
     #. Import-Component "(split-path $profile)\functions" -type PS -recurse
 
-    $baseUri = "https://api.github.com/"
-        $args = "repos/$gitOwner/$gitRepo/contents/functions/!required"
-        $wr = Invoke-WebRequest -Uri $($baseuri+$args)
-        $objects = $wr.Content | ConvertFrom-Json
-        $files = $objects | where-object {$_.type -eq "file"} | Select-object -exp download_url
-
-        foreach ($file in $files) {
-            try {
-                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                "Loaded '$($file)'"
-            } catch {
-                throw "Unable to download '$($file.path)'"
-            }
-        }
-
     #Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
@@ -166,24 +193,4 @@ if ((-not $isAdmin) -and (-not $global:persistProfile)) {
     #Resolve-Path $here\functions\!required\*.ps1 | 
     #Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
     #ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
-    
-} 
-
-
-# inline functions, aliases and variables
-function which($name) { Get-Command $name | Select-Object Definition }
-function rm-rf($item) { Remove-Item $item -Recurse -Force }
-function touch($file) { "" | Out-File $file -Encoding ASCII }
-
-#Set-Alias g gvim
-#$TransientScriptDir = "$here\scripts"
-$UserBinDir = "$($home)\bin"
-
-# PATH update
-#
-# creates paths to every subdirectory of userprofile\bin
-# adds a transient script dir that I use for experiments
-#$paths = @("$($env:Path)", $TransientScriptDir)
-#Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
-#$env:Path = [String]::Join("; ", $paths) 
-
+ 

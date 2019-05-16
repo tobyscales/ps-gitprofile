@@ -2,7 +2,7 @@ if (-not $env:gitProfile) { $env:gitProfile = "tescales/ps-gitprofile" }
 
 function Update-GitProfile {
     param([Parameter(ValueFromPipeline = $true)]
-        [String[]]$gitProfile=$env:gitProfile)
+        [String[]]$gitProfile = $env:gitProfile)
 
     $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Initialize-GitProfile.ps1"
     $global:gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
@@ -24,7 +24,7 @@ function Update-GitProfile {
         }
         else {
             & "$home\.gitprofile\secrets.ps1"
-            Get-GitProfile $gitProfileURL > $env:LocalGitProfile
+            Get-GitProfile $global:gitProfileURL > $env:LocalGitProfile
             return $true
         }
     }
@@ -40,8 +40,12 @@ function Update-GitProfile {
     }
 }
 
-if(Update-GitProfile) { $global:persistProfile=$true; . $env:LocalGitProfile } else { $global:persistProfile=$false; . (
-    [scriptblock]::Create(
-        (Get-GitProfile $global:gitProfileURL)
-    )
-) }
+if (Update-GitProfile) {
+    . $env:LocalGitProfile 
+} else {
+    . (
+        [scriptblock]::Create(
+            (Get-GitProfile $global:gitProfileURL)
+        )
+    ) 
+}
