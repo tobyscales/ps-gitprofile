@@ -22,9 +22,9 @@ function Get-GitFiles {
         $directories = $objects | where {$_.type -eq "dir"}
         
         $directories | ForEach-Object { 
-            if ($_.name -ne "!required") {
+            #if ($_.name -ne "!required") {
             Get-GitFiles -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath (join-path $DestinationPath -childpath $_.name)
-            }
+            #}
         }
     
         
