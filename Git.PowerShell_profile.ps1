@@ -86,7 +86,7 @@ function Mount-CloudShell {
 if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
 $isAdmin = $false
 
-write-host -ForegroundColor Yellow "Loading profile from $here and $($MyInvocation.InvocationName)"
+write-verbose "Loading $env:LocalGitProfile from $here and $($MyInvocation.InvocationName)"
 
 switch ($true) {
     $isWindows {
@@ -114,12 +114,12 @@ if ($env:isConnected) {
 
     $gitOwner = split-path ($env:gitProfile)
     $gitRepo = split-path ($env:gitProfile) -leaf
-    write-host -ForegroundColor yellow "Cloning from $gitRepo..."
+    write-host -ForegroundColor yellow "Loading !required functions from $gitRepo..."
     set-location -Path "$here"
-    #get-childitem
+
     #$gitRepo = "https://github.com/" + $env:gitProfile.substring(34, $env:gitProfile.indexOf("/master") - 34) + ".git" 
     #new-runspace -runspacename "Git Clone" -scriptblock { git clone $gitRepo }
-    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions\!required -DestinationPath "$here\functions\!required"
     #New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here }
 }
 if (-not $isAdmin) {
@@ -142,9 +142,16 @@ if (-not $isAdmin) {
     # load all script modules available to us
     #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
     #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
-    Resolve-Path $here\functions\*.ps1 | 
-    Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
-    ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
+    #Resolve-Path $here\functions\!required\*.ps1 | 
+    #Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
+    #ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
+    foreach ($file in Get-ChildItem $here\functions\!required\*.ps1) {
+        . (
+            [scriptblock]::Create(
+                [io.file]::ReadAllText($file)
+            )
+        )
+    }
 } 
 
 
