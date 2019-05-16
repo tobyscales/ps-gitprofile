@@ -145,7 +145,7 @@ if ((-not $isAdmin) -and (-not $global:persistProfile)) {
     #. Import-Component "C:\Users\toscal\OneDrive - Microsoft\Repos\Github\ps-gitprofile\functions" -type PS -recurse
 
     $baseUri = "https://api.github.com/"
-        $args = "repos/$Owner/$Repository/contents/functions/!required"
+        $args = "repos/$gitOwner/$gitRepo/contents/functions/!required"
         $wr = Invoke-WebRequest -Uri $($baseuri+$args)
         $objects = $wr.Content | ConvertFrom-Json
         $files = $objects | where-object {$_.type -eq "file"} | Select-object -exp download_url
