@@ -24,13 +24,12 @@ function Update-GitProfile {
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-            return  
-                [io.file]::ReadAllText($env:LocalGitProfile)
+            return [io.file]::ReadAllText($env:LocalGitProfile)
             
         }
         else {
-            return 
-                (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1").tostring()
+            "non-persistent"
+            return (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1").tostring()
             
         }
     }
@@ -52,7 +51,5 @@ function Update-GitProfile {
 
 }
 $text=Update-GitProfile
-. ( [scriptblock]::Create(
-    $text
-    ) 
+. ( [scriptblock]::Create($text) 
 )
