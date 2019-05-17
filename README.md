@@ -9,7 +9,9 @@ iwr aka.ms/psgp | iex
 
 This will give you the [default profile](https://github.com/tescales/ps-gitprofile/blob/master/Git.PowerShell_profile.ps1) and pre-load the functions in the [!required](https://github.com/tescales/ps-gitprofile/tree/master/functions/!required) folder.
 
-This is referred to as "non-persistent" mode since all the loaded functions and settings automatically disappear when you close your session. It's also a great way to try out the profile and see if you like it!
+You can load additional functions by running `. Import-GitFunction Function-Name`. (Note you need to dot-source the Import-GitFunction command to make the function available in your current session!)
+
+This mode is referred to as "non-persistent" mode since all the loaded functions and settings automatically disappear when you close your session. It's also a great way to try out the profile and see if you like it!
 
 To make ps-gitprofile your default profile, run the above command then 
 ```
