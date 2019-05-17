@@ -24,14 +24,14 @@ function Update-GitProfile {
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-            return  [scriptblock]::Create(
+            return  
                 [io.file]::ReadAllText($env:LocalGitProfile)
-            )
+            
         }
         else {
-            return [scriptblock]::Create(
+            return 
                 (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1")
-            ) 
+            
         }
     }
     else {
@@ -39,9 +39,9 @@ function Update-GitProfile {
 
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-            return  [scriptblock]::Create(
+            return  
                 [io.file]::ReadAllText($env:LocalGitProfile)
-            )    
+            
         }
         else {
             return { 
@@ -52,4 +52,4 @@ function Update-GitProfile {
 
 }
 
-. (Update-GitProfile)
+. ( [scriptblock]::Create(Update-GitProfile) )
