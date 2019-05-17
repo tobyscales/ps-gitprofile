@@ -19,7 +19,6 @@ function global:Initialize-GitProfile {
         [String[]]$gitProfile=$env:gitProfile)
 
     $configureMachine = ""
-    #$useDefaultGitProfile = ""
     $useCloudShell = ""
     $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
     $profileURL = "https://raw.githubusercontent.com/$gitProfile/master/profile.ps1"
@@ -28,20 +27,20 @@ function global:Initialize-GitProfile {
     $envVars = @{ }
 
     while ("Y", "N" -notcontains $configureMachine.toUpper()) {
-        $configureMachine = Read-Host "Would you like to configure this machine to always use `n--->$gitProfileURL`nas your PowerShell profile?"
+        $configureMachine = Read-Host "Always use `n--->$gitProfileURL`nas your PowerShell profile?`n(CAUTION: WILL OVERWRITE EXISTING PROFILE)"
         switch ($configureMachine.toUpper()) {
             "N" { 
-                $global:persistProfile=$false
+                
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
-                return $false
+                
              }
             "Y" {
-                $global:persistProfile=$true
+                
                 Set-GitProfile $profileURL
 
                 while ("Y", "N" -notcontains $useCloudShell.toUpper()) {
-                    $useCloudShell = Read-Host "Would you like to use Azure Cloud Shell to store your PowerShell profile and functions?"
+                    $useCloudShell = Read-Host "Would you like to automatically map your Azure Cloud Shell drive?"
         
                     switch ($useCloudShell.toUpper()) {
                         "Y" {
@@ -79,7 +78,7 @@ function global:Initialize-GitProfile {
 
                 & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-                return $true
+                . $env:LocalGitProfile
             }
             default { $configureMachine = Read-Host "Please enter Y or N" }
         }
