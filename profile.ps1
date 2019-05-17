@@ -27,6 +27,20 @@ function Update-GitProfile {
             return $true
         }
         else {
+            # Non-persistent function loader
+            $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
+            $objects = $wr.Content | ConvertFrom-Json
+            $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+            
+            foreach ($file in $files) {
+                try {
+                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+                    write-host -ForegroundColor Yellow "Loaded '$($file)'"
+                }
+                catch {
+                    throw "Unable to download '$($file.path)'"
+                }
+            }
             return $false #(Initialize-GitProfile $gitProfile)
         }
     }
