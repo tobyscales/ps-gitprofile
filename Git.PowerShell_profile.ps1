@@ -86,7 +86,7 @@ function Mount-CloudShell {
 }
 #endregion functions
 
-$here = ""
+$here = (split-path $profile)
 $isAdmin = $false
 
 write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
@@ -100,7 +100,7 @@ switch ($true) {
     }
     $isMacOS { 
         #TODO: $isAdmin = something;
-     }
+    }
 } 
 
 $gitOwner = split-path ($env:gitProfile)
@@ -120,9 +120,11 @@ switch ($global:isConnected) {
             if ($env:storageKey) { $here = Mount-CloudShell; write-host "Mapped Cloud drive to $here." }
 
             write-host -ForegroundColor yellow "Loading functions from $gitRepo..."
+            $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
 
-            Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions"
-            foreach ($file in Get-ChildItem $here\functions\*.ps1 -recurse) {
+            Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath
+            
+            foreach ($file in Get-ChildItem (join-path $requiredPath *.ps1) -recurse) {
                 . (
                     [scriptblock]::Create(
                         [io.file]::ReadAllText($file)
@@ -130,6 +132,7 @@ switch ($global:isConnected) {
                 )
             }
             New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
+            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
         }
         else {
             # Non-persistent function loader
@@ -159,38 +162,40 @@ write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
 set-location -Path "$here"
 
 if (-not $isAdmin) {
+    if ($isWindows) {
         #used for when cloud-shell is mapped as a drive; wish there was a better way around this!
         # (can't use unblock-file because SMB shares don't support FileStream Zone.Identifiers)
         # would be ideal --> get-item $here\functions\*.ps1 | Unblock-File
         Set-ExecutionPolicy Bypass -Scope Process -Force
-
-        $TransientScriptDir = "$here\scripts"
-        #$UserBinDir = "$($home)\bin"
-    
-        # PATH update
-        #
-        # creates paths to every subdirectory of userprofile\bin
-        # adds a transient script dir that I use for experiments
-        $paths = @("$($env:Path)", $TransientScriptDir)
-        #Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
-        $env:Path = [String]::Join("; ", $paths) 
-    
     }
 
-    #OLD/FUTURE USE CODE
-    # if you want to add functions you can added scripts to your
-    # powershell profile functions directory or you can inline them
-    # in this file. Ignoring the dot source of any tests
-    #write-host "Re-loading functions."
-    #$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
-    #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
-    #. Import-Component "(split-path $profile)\functions" -type PS -recurse
+    $TransientScriptDir = "$here\scripts"
+    #$UserBinDir = "$($home)\bin"
+    
+    # PATH update
+    #
+    # creates paths to every subdirectory of userprofile\bin
+    # adds a transient script dir that I use for experiments
+    $paths = @("$($env:Path)", $TransientScriptDir)
+    #Get-ChildItem $UserBinDir | ForEach-Object { $paths += $_.FullName }
+    $env:Path = [String]::Join("; ", $paths) 
+    
+}
 
-    #Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
-    # load all script modules available to us
-    #Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
-    #Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
-    #Resolve-Path $here\functions\!required\*.ps1 | 
-    #Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
-    #ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
+#OLD/FUTURE USE CODE
+# if you want to add functions you can added scripts to your
+# powershell profile functions directory or you can inline them
+# in this file. Ignoring the dot source of any tests
+#write-host "Re-loading functions."
+#$importC= "https://raw.githubusercontent.com/beatcracker/Powershell-Misc/master/Import-Component.ps1"
+#Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($importC))
+#. Import-Component "(split-path $profile)\functions" -type PS -recurse
+
+#Invoke-RequiredFunctions -owner $gitOwner -repository $gitRepo -Path 'functions/!required'
+# load all script modules available to us
+#Get-Module -ListAvailable | where-object { $_.ModuleType -eq "Script" } | Import-Module
+#Resolve-Path $here\functions\*.ps1 | Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } | ForEach-Object { . $_.Path } #$filen=$_.Path; unblock-file -Path $filen;
+#Resolve-Path $here\functions\!required\*.ps1 | 
+#Where-Object { -not ($_.ProviderPath.Contains(".Tests.")) } |
+#ForEach-Object { . $_.ProviderPath; write-host ". $($_.ProviderPath)" }
  
