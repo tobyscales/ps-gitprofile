@@ -9,11 +9,6 @@
 # 
 ###########################################################
 
-# TO ADD: auto-import ARM snippets: https://danielpaulus.com/arm-templates-with-visual-studio-code/
-# TO ADD: auto-debug ARM tempaltes: https://azure.microsoft.com/en-us/blog/debugging-arm-template-deployments/
-# TO ADD: CSS-styling for GH Markdown: https://gist.github.com/JamesMessinger/5d31c053d0b1d52389eb2723f7550907
-# TODO: add "isAdmin" check for Linux root
-
 #$ErrorActionPreference = 'SilentlyContinue'
 
 #region functions
@@ -141,11 +136,12 @@ switch ($global:isConnected) {
         if ($env:LocalGitProfile) {
             
             #env:storageKey means we're persisting a cloudshell
-            if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $cloudShell." }
+            if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $cloudShell."; set-location $cloudShell }
 
-            write-host -ForegroundColor yellow "Loading required functions from $gitRepo..."
+            write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
-            Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
+            #TODO: check for existence of git, use git clone where applicable to allow 2-way sync
+            #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
             New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
             New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
             

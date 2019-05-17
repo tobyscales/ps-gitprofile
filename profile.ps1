@@ -18,11 +18,11 @@ function Update-GitProfile {
     }
     
     if ($global:isConnected) { 
-        Write-host -ForegroundColor Green "Running in online mode."
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))
 
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
+            Write-host -ForegroundColor Green "Running in online mode."
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
             return [scriptblock]::Create(
                 [io.file]::ReadAllText($env:LocalGitProfile)
@@ -49,5 +49,5 @@ function Update-GitProfile {
     }
 
 }
-$text=Update-GitProfile
-. ( $text )
+
+. ( Update-GitProfile )

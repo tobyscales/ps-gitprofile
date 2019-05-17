@@ -23,3 +23,15 @@ This will also give you the option to automount your Azure Cloud Shell drive on 
  * Azure Cloud Shell Storage Account Key
 
 Finally, for advanced users you can clone this repo and change the $env:gitProfile variable at the top of profile.ps1 to point all the defaults to your repository instead. 
+
+#TODO:
+* Add current profile/config restore and backup for a cleaner uninstall experience
+* Add ability to update profile.ps1 after initial setup
+* Cleanup logic in Import-GitFunction to allow case mismatches
+* Add git support for 2-way sync
+* TO ADD: auto-import ARM snippets: https://danielpaulus.com/arm-templates-with-visual-studio-code/
+* TO ADD: auto-debug ARM tempaltes: https://azure.microsoft.com/en-us/blog/debugging-arm-template-deployments/
+* TO ADD: CSS-styling for GH Markdown: https://gist.github.com/JamesMessinger/5d31c053d0b1d52389eb2723f7550907
+* TODO: add "isAdmin" check for Linux root
+* Add MacOS support for Cloudshell
+* Add auto-detection of Cloudshell environment
