@@ -8,7 +8,7 @@ function Get-Time { return $(get-date | ForEach-Object { $_.ToLongTimeString() }
 # This is function is called by convention in PowerShell
 function global:prompt { 
     #Put the full path in the title bar
-    $host.UI.RawUI.WindowTitle = Get-Location + " " + Get-Time
+    #$host.UI.RawUI.WindowTitle = Get-Location + " " + Get-Time
    
     # our theme 
     $cdelim = [ConsoleColor]::DarkCyan 

@@ -13,8 +13,8 @@ function global:Import-GitFunction {
         [string]$FunctionName
     )
     
-    $gitOwner = split-path ($env:gitProfile)
-    $gitRepo = split-path ($env:gitProfile) -leaf
+    $Owner = split-path ($env:gitProfile)
+    $Repository = split-path ($env:gitProfile) -leaf
 
     $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$Owner/$Repository/contents/functions"
     $objects = $wr.Content | ConvertFrom-Json

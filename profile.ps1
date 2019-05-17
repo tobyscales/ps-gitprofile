@@ -5,7 +5,7 @@ function Update-GitProfile {
         [String[]]$gitProfile = $env:gitProfile)
 
     $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Initialize-GitProfile.ps1"
-    $global:gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
+    $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
 
     #TODO: use runspaces for faster loading?
     #$runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
@@ -21,7 +21,7 @@ function Update-GitProfile {
 
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
-            Get-GitProfile $global:gitProfileURL > $env:LocalGitProfile
+            Get-GitProfile $gitProfileURL > $env:LocalGitProfile
             return $true
         }
         else {
@@ -40,14 +40,17 @@ function Update-GitProfile {
             break;
         }
     }
+    if ($env:gitProfile) {
+        #running in persisted mode
+        . $env:LocalGitProfile 
+    }
+    else {
+        . (
+            [scriptblock]::Create(
+                (Get-GitProfile $gitProfileURL)
+            )
+        ) 
+    }    
 }
 
-if (Update-GitProfile) {
-    . $env:LocalGitProfile 
-} else {
-    . (
-        [scriptblock]::Create(
-            (Get-GitProfile $global:gitProfileURL)
-        )
-    ) 
-}
+Update-GitProfile
