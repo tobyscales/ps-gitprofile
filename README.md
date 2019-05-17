@@ -35,3 +35,5 @@ Finally, for advanced users you can clone this repo and change the $env:gitProfi
 * TODO: add "isAdmin" check for Linux root
 * Add MacOS support for Cloudshell
 * Add auto-detection of Cloudshell environment
+* add scriptblock logic for import-gitfunction to allow direct import (without dot-sourcing)
+* add faster online detection using try/catch with IWR
