@@ -40,6 +40,7 @@ function Get-GitFiles {
         foreach ($file in $files) {
             $fileDestination = Join-Path $DestinationPath (Split-Path $file -Leaf)
             try {
+                write-host "saving file $file to $fileDestination..."
                 Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop 
                 write-verbose "Saved '$($file)' to '$fileDestination'"
             } catch {
