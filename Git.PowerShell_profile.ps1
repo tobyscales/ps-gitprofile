@@ -34,7 +34,7 @@ function Mount-CloudShell {
     if ($global:isConnected) {
         switch ($true) {
             $isWindows {
-                if (Get-PSDrive -name S) {
+                if (Get-PSDrive -name S -ErrorAction SilentlyContinue) {
                     Write-Verbose "Found S:\ drive."
                     return "S:"
                 }
@@ -127,7 +127,7 @@ switch ($global:isConnected) {
         if ($env:LocalGitProfile) {
             
             #env:storageKey means we're persisting to cloudshell
-            if ($env:storageKey) { $here = Mount-CloudShell; write-host "Mapped Cloud drive to $here." }
+            if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $cloudShell." }
 
             write-host -ForegroundColor yellow "Loading required functions from $gitRepo..."
             $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
