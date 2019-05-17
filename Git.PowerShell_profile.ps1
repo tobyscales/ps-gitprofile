@@ -21,6 +21,13 @@ function which($name) { Get-Command $name | Select-Object Definition }
 function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
+function import-gFunction($name) {         
+    . (
+        [scriptblock]::Create(
+            (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1")
+        )
+    ) 
+}
 function Mount-CloudShell {
     if ($global:isConnected) {
         switch ($true) {
@@ -119,7 +126,7 @@ switch ($global:isConnected) {
             #env:storageKey means we're persisting to cloudshell
             if ($env:storageKey) { $here = Mount-CloudShell; write-host "Mapped Cloud drive to $here." }
 
-            write-host -ForegroundColor yellow "Loading functions from $gitRepo..."
+            write-host -ForegroundColor yellow "Loading required functions from $gitRepo..."
             $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
 
             Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath $requiredPath
@@ -136,9 +143,7 @@ switch ($global:isConnected) {
         }
         else {
             # Non-persistent function loader
-            $baseUri = "https://api.github.com/"
-            $args = "repos/$gitOwner/$gitRepo/contents/functions/!required"
-            $wr = Invoke-WebRequest -Uri $($baseuri + $args)
+            $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
             $objects = $wr.Content | ConvertFrom-Json
             $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
 

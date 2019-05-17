@@ -22,14 +22,10 @@ function global:Import-GitFunction {
     
     foreach ($file in $files) {
         if ((split-path $file -leaf) -eq "$FunctionName.ps1") {
-            try {
-                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                "Loaded '$file'"
-            }
-            catch {
-                throw "Unable to download '$file'"
-            }
+            return ((New-Object System.Net.WebClient).DownloadString($file))
+        }
+        else {
+            return "Unable to load '$file'"
         }
     }
-    
 }
