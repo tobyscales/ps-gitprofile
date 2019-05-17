@@ -10,7 +10,11 @@ function global:Import-GitFunction {
     Param(
         [string]$functionName
     )
+<<<<<<< HEAD
     
+=======
+    $functionName=$functionName.tolower().trim()
+>>>>>>> 533f3430fdcbfe7cd7e0caf732d452f595ce69a9
     write-host "Downloading function $functionName from https://raw.githubusercontent.com/$env:gitProfile/master/functions/$functionName.ps1"
     . (
         [scriptblock]::Create(
