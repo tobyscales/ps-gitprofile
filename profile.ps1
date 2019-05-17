@@ -34,7 +34,7 @@ function Update-GitProfile {
             
             foreach ($file in $files) {
                 try {
-                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+                    #invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
                     write-host -ForegroundColor Yellow "Loaded '$($file)'"
                 }
                 catch {
