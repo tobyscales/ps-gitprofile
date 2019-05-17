@@ -4,7 +4,7 @@ function Update-GitProfile {
     param([Parameter(ValueFromPipeline = $true)]
         [String[]]$gitProfile = $env:gitProfile)
 
-    $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Initialize-GitProfile.ps1"
+    $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/!required/Initialize-GitProfile.ps1"
     $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
 
     #TODO: use runspaces for faster loading?
