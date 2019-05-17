@@ -146,19 +146,18 @@ switch ($global:isConnected) {
         }
         else {
             # Non-persistent function loader
-            $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
-            $objects = $wr.Content | ConvertFrom-Json
-            $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+            ##$wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
+            ##$objects = $wr.Content | ConvertFrom-Json
+            ##$files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
 
-            foreach ($file in $files) {
-                try {
-                    write-host -ForegroundColor Yellow "Loading '$($file)'"
-                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                }
-                catch {
-                    throw "Unable to download '$($file.path)'"
-                }
-            }
+            ##foreach ($file in $files) {
+            ##    try {
+            ##       invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+            ##  }
+            ##    catch {
+            ##        throw "Unable to download '$($file.path)'"
+            ##    }
+            ##}
         }
     }
     $false {
@@ -166,8 +165,7 @@ switch ($global:isConnected) {
     }
 }
 
-write-host -ForegroundColor Yellow "Running Git.PowerShell from: $here"
-set-location -Path "$here"
+write-Verbose "Now running Git.PowerShell from: $here"
 
 if (-not $isAdmin) {
     if ($isWindows) {

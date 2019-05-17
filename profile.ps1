@@ -34,8 +34,8 @@ function Update-GitProfile {
             
             foreach ($file in $files) {
                 try {
-                    #invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                    write-host -ForegroundColor Yellow "Loaded '$($file)'"
+                    Write-Verbose "Loading $file from $env:gitProfile"
+                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
                 }
                 catch {
                     throw "Unable to download '$($file.path)'"
