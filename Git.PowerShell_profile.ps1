@@ -152,7 +152,7 @@ switch ($global:isConnected) {
             foreach ($file in $files) {
                 try {
                     invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                    "Loaded '$($file)'"
+                    write-host -ForegroundColor Yellow "Loaded '$($file)'"
                 }
                 catch {
                     throw "Unable to download '$($file.path)'"

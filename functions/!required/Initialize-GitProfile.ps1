@@ -12,7 +12,6 @@ function global:Get-GitProfile {
     
     return (New-Object System.Net.WebClient).DownloadString($gitProfileURL)
 }
-
 function global:Initialize-GitProfile {
     param(
         [Parameter( Mandatory, 
@@ -57,6 +56,7 @@ function global:Initialize-GitProfile {
                                 '$env:gitProfile'      = "$gitProfile"
                                 '$env:storagePath'     = "$storageAcct\$storageShare"
                                 '$env:storageKey'      = $storageKey
+                                #TODO: put cloudshell into path or alias to 
                                 '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
                             }
                         }

@@ -27,7 +27,7 @@ function Update-GitProfile {
             return $true
         }
         else {
-            return (Initialize-GitProfile $gitProfile)
+            return $false #(Initialize-GitProfile $gitProfile)
         }
     }
     else {
