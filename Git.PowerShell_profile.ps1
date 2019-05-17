@@ -21,7 +21,8 @@ function which($name) { Get-Command $name | Select-Object Definition }
 function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
-function import-gFunction($name) {         
+function import-gFunction($name) {    
+    $name=$name.tolower().trim()     
     write-host "downloading from https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1"
     . (
         [scriptblock]::Create(
