@@ -14,9 +14,9 @@ function global:Get-GitProfile {
 }
 function global:Initialize-GitProfile {
     param(
-        [Parameter( Mandatory, 
+        [Parameter(  
             ValueFromPipeline = $true)]
-        [String[]]$gitProfile)
+        [String[]]$gitProfile=$env:gitProfile)
 
     $configureMachine = ""
     #$useDefaultGitProfile = ""

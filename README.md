@@ -1,18 +1,23 @@
 # ps-gitprofile
 Automagically sync your PowerShell profile across Linux, Windows and Azure Cloud Shell.
 
-To install, just run this code from your PowerShell6 prompt: 
+To run at your current PowerShell6 prompt, simply type: 
 
 ```
 iwr aka.ms/psgp | iex
 ```
 
-You'll have the option of making it your default profile or having it ride shotgun next to your existing profile.
+This will give you the [default profile](https://github.com/tescales/ps-gitprofile/blob/master/Git.PowerShell_profile.ps1) and pre-load the functions in the [!required](https://github.com/tescales/ps-gitprofile/tree/master/functions/!required) folder.
 
-If you choose to have your profile stored in Azure Cloud Shell, you'll need the following information (which will then be stored in PLAINTEXT in $home\.gitprofile -- you've been warned!)
+This is referred to as "non-persistent" mode since all the loaded functions and settings automatically disappear when you close your session. It's also a great way to try out the profile and see if you like it!
+
+To make ps-gitprofile your default profile, run the above command then 
+```
+Initialize-GitProfile 
+```
+
+This will also give you the option to automount your Azure Cloud Shell drive on every execution. In order to do that, you'll need the following information (which will then be stored in PLAINTEXT in $home\.gitprofile -- you've been warned!)
  * Azure Cloud Shell Storage Account Name & Shared Folder Name
  * Azure Cloud Shell Storage Account Key
 
- When you're bouncing to a new machine and don't want to install the whole profile, you can run the command above and choose 'n' at the first prompt, which will then load only the scripts and functions under the !required folder into the current runspace. Nifty!
-
- Finally, for advanced users you can clone this repo and change the $env:gitProfile variable at the top of profile.ps1. 
+Finally, for advanced users you can clone this repo and change the $env:gitProfile variable at the top of profile.ps1 to point all the defaults to your repository instead. 
