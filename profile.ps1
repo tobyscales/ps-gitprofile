@@ -13,8 +13,10 @@ function Update-GitProfile {
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
 
     #$ErrorActionPreference = 'SilentlyContinue'
-    if ($PSVersionTable.PSVersion.Major -ge 6) { $global:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $global:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
-
+    if (-not $isConnected) {
+        if ($PSVersionTable.PSVersion.Major -ge 6) { $global:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $global:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
+    }
+    
     if ($global:isConnected) { 
         Write-host -ForegroundColor Green "Running in online mode."
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))

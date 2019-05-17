@@ -129,7 +129,7 @@ switch ($global:isConnected) {
             write-host -ForegroundColor yellow "Loading required functions from $gitRepo..."
             $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
 
-            Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath $requiredPath
+            #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath $requiredPath
             
             foreach ($file in Get-ChildItem (join-path $requiredPath *.ps1) -recurse) {
                 . (

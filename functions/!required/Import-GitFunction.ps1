@@ -8,24 +8,15 @@
 #>
 function global:Import-GitFunction {
     Param(
-        [string]$Owner,
-        [string]$Repository,
+        [string]$Owner = (split-path ($env:gitProfile)),
+        [string]$Repository = (split-path ($env:gitProfile) -leaf),
         [string]$FunctionName
     )
-    
-    $Owner = split-path ($env:gitProfile)
-    $Repository = split-path ($env:gitProfile) -leaf
 
-    $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$Owner/$Repository/contents/functions"
-    $objects = $wr.Content | ConvertFrom-Json
-    $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
-    
-    foreach ($file in $files) {
-        if ((split-path $file -leaf) -eq "$FunctionName.ps1") {
-            return ((New-Object System.Net.WebClient).DownloadString($file))
-        }
-        else {
-            return "Unable to load '$file'"
-        }
-    }
+    . (
+        [scriptblock]::Create(
+            (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$owner/$repository/master/functions/$FunctionName.ps1")
+            
+        )
+    )
 }
