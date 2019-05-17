@@ -12,7 +12,7 @@ function global:Import-GitFunction {
         [string]$Repository = (split-path ($env:gitProfile) -leaf),
         [string]$FunctionName
     )
-
+    write-host "Downloading function $FunctionName from https://raw.githubusercontent.com/$owner/$repository/master/functions/$FunctionName.ps1"
     . (
         [scriptblock]::Create(
             (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$owner/$repository/master/functions/$FunctionName.ps1")
