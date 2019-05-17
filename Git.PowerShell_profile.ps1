@@ -132,17 +132,11 @@ switch ($global:isConnected) {
             write-host -ForegroundColor yellow "Loading required functions from $gitRepo..."
             $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
 
-            Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath $requiredPath
+            #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath $requiredPath
             New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
             New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
             
-            foreach ($file in Get-ChildItem (join-path $requiredPath *.ps1) -recurse) {
-                . (
-                    [scriptblock]::Create(
-                        [io.file]::ReadAllText($file)
-                    )
-                )
-            }
+            . Import-LocalFunctions
         }
         else {
             # Non-persistent function loader

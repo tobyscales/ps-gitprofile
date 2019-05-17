@@ -26,22 +26,23 @@ function Update-GitProfile {
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
             return $true
         }
-        else {
-            # Non-persistent function loader
-            $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
-            $objects = $wr.Content | ConvertFrom-Json
-            $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+        #else {
             
-            foreach ($file in $files) {
-                try {
-                    Write-Verbose "Loading $file from $env:gitProfile"
-                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-                }
-                catch {
-                    throw "Unable to download '$($file.path)'"
-                }
+            return $false 
+        }
+        # Non-persistent function loader, for speed
+        $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
+        $objects = $wr.Content | ConvertFrom-Json
+        $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+        
+        foreach ($file in $files) {
+            try {
+                Write-Verbose "Loading $file from $env:gitProfile"
+                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
             }
-            return $false #(Initialize-GitProfile $gitProfile)
+            catch {
+                throw "Unable to download '$($file.path)'"
+            }
         }
     }
     else {
