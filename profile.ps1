@@ -19,24 +19,26 @@ function Update-GitProfile {
         Write-host -ForegroundColor Green "Running in online mode."
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))
 
-        if (-not (test-path $home\.gitprofile\secrets.ps1)) {
-            return (Initialize-GitProfile $gitProfile)
-        }
-        else {
+        if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $global:gitProfileURL > $env:LocalGitProfile
             return $true
+        }
+        else {
+            return (Initialize-GitProfile $gitProfile)
         }
     }
     else {
         Write-Host -foregroundcolor yellow "Running in offline mode."
 
-        if (-not (test-path $home\.gitprofile\secrets.ps1)) {
-            write-host -ForegroundColor red "Must be connected to run setup."
+        if (test-path $home\.gitprofile\secrets.ps1) {
+            & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
+            return $true    
         }
-
-        & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-        return $true
+        else {
+            write-host -ForegroundColor red "Must be connected to run setup."
+            break;
+        }
     }
 }
 
