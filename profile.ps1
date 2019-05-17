@@ -42,17 +42,17 @@ function Update-GitProfile {
             break;
         }
     }
-    if ($env:gitProfile) {
-        #running in persisted mode
-        . $env:LocalGitProfile 
-    }
-    else {
-        . (
-            [scriptblock]::Create(
-                (Get-GitProfile $gitProfileURL)
-            )
-        ) 
-    }    
+
 }
 
-Update-GitProfile
+if (Update-GitProfile) {
+    #running in persisted mode
+    . $env:LocalGitProfile 
+}
+else {
+    . (
+        [scriptblock]::Create(
+            (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1")
+        )
+    ) 
+}    
