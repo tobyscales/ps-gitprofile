@@ -30,7 +30,7 @@ function Update-GitProfile {
         }
         else {
             return 
-                (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1")
+                (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1").tostring()
             
         }
     }
@@ -45,14 +45,13 @@ function Update-GitProfile {
         }
         else {
             return { 
-                write-host -ForegroundColor red "Must be connected to run setup."
+                "Must be connected to run setup."
             }
         }
     }
 
 }
 $text=Update-GitProfile
-
 . ( [scriptblock]::Create(
     $text
     ) 
