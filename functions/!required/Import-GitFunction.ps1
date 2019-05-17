@@ -19,3 +19,14 @@ function global:Import-GitFunction {
         )
     )
 }
+function Import-LocalFunctions {
+    $functionpath = (join-path $here -childpath "functions")
+
+    foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
+        . (
+            [scriptblock]::Create(
+                [io.file]::ReadAllText($file)
+            )
+        )
+    }
+}
