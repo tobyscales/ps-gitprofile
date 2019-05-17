@@ -19,7 +19,7 @@ function global:Import-GitFunction {
         )
     )
 }
-function Import-LocalFunctions {
+function global:Import-LocalFunctions {
     $functionpath = (join-path $here -childpath "functions")
 
     foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {

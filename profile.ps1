@@ -33,20 +33,6 @@ function Update-GitProfile {
                 (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1")
             ) 
         }
-        # Non-persistent function loader, for speed
-        $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
-        $objects = $wr.Content | ConvertFrom-Json
-        $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
-        
-        foreach ($file in $files) {
-            try {
-                Write-Verbose "Loading $file from $env:gitProfile"
-                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-            }
-            catch {
-                throw "Unable to download '$($file.path)'"
-            }
-        }
     }
     else {
         Write-Host -foregroundcolor yellow "Running in offline mode."

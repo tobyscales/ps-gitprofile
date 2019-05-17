@@ -22,7 +22,7 @@ function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 function import-gFunction($name) {    
-    $name=$name.tolower().trim()     
+    $name = $name.tolower().trim()     
     write-host "downloading from https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1"
     . (
         [scriptblock]::Create(
@@ -123,14 +123,27 @@ switch ($global:isConnected) {
         $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
 
+        # Non-persistent function loader, for speed
+        $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
+        $objects = $wr.Content | ConvertFrom-Json
+        $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+                
+        foreach ($file in $files) {
+            try {
+                Write-Verbose "Loading $file from $env:gitProfile"
+                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+            }
+            catch {
+                throw "Unable to download '$($file.path)'"
+            }
+        }
         #env:LocalGitProfile means we're persisting a profile
         if ($env:LocalGitProfile) {
             
-            #env:storageKey means we're persisting to cloudshell
+            #env:storageKey means we're persisting a cloudshell
             if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $cloudShell." }
 
             write-host -ForegroundColor yellow "Loading required functions from $gitRepo..."
-            $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
 
             Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
             New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
