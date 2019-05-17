@@ -24,10 +24,14 @@ function Update-GitProfile {
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-            return $true
+            return  [scriptblock]::Create(
+                [io.file]::ReadAllText($env:LocalGitProfile)
+            )
         }
         else {
-            return $false 
+            return [scriptblock]::Create(
+                (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1")
+            ) 
         }
         # Non-persistent function loader, for speed
         $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
@@ -49,24 +53,17 @@ function Update-GitProfile {
 
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-            return $true    
+            return  [scriptblock]::Create(
+                [io.file]::ReadAllText($env:LocalGitProfile)
+            )    
         }
         else {
-            write-host -ForegroundColor red "Must be connected to run setup."
-            break;
+            return { 
+                write-host -ForegroundColor red "Must be connected to run setup."
+            }
         }
     }
 
 }
 
-if (Update-GitProfile) {
-    #running in persisted mode
-    . $env:LocalGitProfile 
-}
-else {
-    . (
-        [scriptblock]::Create(
-            (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1")
-        )
-    ) 
-}    
+. Update-GitProfile
