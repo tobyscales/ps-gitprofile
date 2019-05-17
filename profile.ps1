@@ -24,13 +24,14 @@ function Update-GitProfile {
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
-            return [io.file]::ReadAllText($env:LocalGitProfile)
-            
+            return [scriptblock]::Create(
+                [io.file]::ReadAllText($env:LocalGitProfile)
+            )
         }
         else {
-            "non-persistent"
-            return (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1").tostring()
-            
+            return [scriptblock]::Create(
+                (Get-GitProfile "https://raw.githubusercontent.com/$env:gitProfile/master/Git.PowerShell_profile.ps1").tostring()
+            )
         }
     }
     else {
@@ -38,18 +39,15 @@ function Update-GitProfile {
 
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-            return  
+            return  [scriptblock]::Create(
                 [io.file]::ReadAllText($env:LocalGitProfile)
-            
+            )
         }
         else {
-            return { 
-                "Must be connected to run setup."
-            }
+            return [scriptblock]::Create("Must be connected to run setup.")
         }
     }
 
 }
 $text=Update-GitProfile
-. ( [scriptblock]::Create($text) 
-)
+. ( $text )
