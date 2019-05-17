@@ -22,6 +22,7 @@ function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 function import-gFunction($name) {         
+    write-host "downloading from https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1"
     . (
         [scriptblock]::Create(
             (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1")
@@ -123,6 +124,7 @@ switch ($global:isConnected) {
 
         #env:LocalGitProfile means we're persisting a profile
         if ($env:LocalGitProfile) {
+            
             #env:storageKey means we're persisting to cloudshell
             if ($env:storageKey) { $here = Mount-CloudShell; write-host "Mapped Cloud drive to $here." }
 
@@ -130,6 +132,8 @@ switch ($global:isConnected) {
             $requiredPath = (join-path $here -childpath "functions" -AdditionalChildPath "!required")
 
             #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions/!required -DestinationPath $requiredPath
+            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
+            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
             
             foreach ($file in Get-ChildItem (join-path $requiredPath *.ps1) -recurse) {
                 . (
@@ -138,8 +142,6 @@ switch ($global:isConnected) {
                     )
                 )
             }
-            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
-            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
         }
         else {
             # Non-persistent function loader
