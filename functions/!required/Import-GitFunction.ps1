@@ -13,6 +13,9 @@ function global:Import-GitFunction {
         [string]$FunctionName
     )
     
+    $gitOwner = split-path ($env:gitProfile)
+    $gitRepo = split-path ($env:gitProfile) -leaf
+
     $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$Owner/$Repository/contents/functions"
     $objects = $wr.Content | ConvertFrom-Json
     $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
