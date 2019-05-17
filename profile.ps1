@@ -26,8 +26,7 @@ function Update-GitProfile {
             Get-GitProfile $gitProfileURL > $env:LocalGitProfile
             return $true
         }
-        #else {
-            
+        else {
             return $false 
         }
         # Non-persistent function loader, for speed
