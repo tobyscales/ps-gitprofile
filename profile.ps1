@@ -51,5 +51,9 @@ function Update-GitProfile {
     }
 
 }
+$text=Update-GitProfile
 
-. ( [scriptblock]::Create(Update-GitProfile) )
+. ( [scriptblock]::Create(
+    $text
+    ) 
+)
