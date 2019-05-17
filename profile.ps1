@@ -52,4 +52,4 @@ function Update-GitProfile {
 
 }
 
-. Update-GitProfile
+. (Update-GitProfile)
