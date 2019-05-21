@@ -136,7 +136,7 @@ switch ($global:isConnected) {
         if ($env:LocalGitProfile) {
             
             #env:storageKey means we're persisting a cloudshell
-            if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $cloudShell."; set-location $cloudShell }
+            if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root }
 
             write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
