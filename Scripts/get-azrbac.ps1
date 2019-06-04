@@ -61,16 +61,15 @@ if (-not (get-azsubscription)) {
 
 remove-item $logFile -force -ErrorAction SilentlyContinue
 
-$subscriptions = Get-AzSubscription 
-
+$contexts = Get-AzContext -listavailable 
 # Loop through all Subscriptions that you have access to and export the Role information
-foreach ($sub in $subscriptions) {
+foreach ($context in $contexts) {
 
-    Write-Verbose -Message "Changing to Subscription $($sub.Name)" -Verbose
-    Set-AzContext -SubscriptionObject $sub > $null
+    Write-Verbose -Message "Changing to Subscription $($context.Subscription.Name)"
+    Set-AzContext $context > $null
 
-    $Name = $sub.Name
-    $TenantId = $sub.TenantId
+    $Name = $context.Subscription.Name
+    $TenantId = $context.Subscription.TenantId
 
     Get-AzRoleAssignment -IncludeClassicAdministrators | Select RoleDefinitionName, DisplayName, SignInName, ObjectType, Scope,
     @{name = 'TenantId'; expression = {$TenantId}}, @{name = 'SubscriptionName'; expression = {$Name}} -OutVariable roles >$null

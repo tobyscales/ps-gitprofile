@@ -1,11 +1,4 @@
-<#
-##cribbed from https://gist.github.com/chrisbrownie/f20cb4508975fb7fb5da145d3d38024a 
-.Synopsis
-   This function will download a Github Repository without using Git
-.DESCRIPTION
-.EXAMPLE
 
-#>
 function global:Import-GitFunction {
     Param(
         [string]$functionName
@@ -18,15 +11,4 @@ function global:Import-GitFunction {
             
         )
     )
-}
-function global:Import-LocalFunctions {
-    $functionpath = (join-path $here -childpath "functions")
-
-    foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
-        . (
-            [scriptblock]::Create(
-                [io.file]::ReadAllText($file)
-            )
-        )
-    }
 }

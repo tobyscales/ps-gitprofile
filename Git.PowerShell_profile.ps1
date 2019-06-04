@@ -15,78 +15,16 @@
 function which($name) { Get-Command $name | Select-Object Definition }
 function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
+function Import-LocalFunctions {
+    $functionpath = (join-path $here -childpath "functions")
 
-function import-gFunction($name) {    
-    $name = $name.tolower().trim()     
-    write-host "downloading from https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1"
-    . (
-        [scriptblock]::Create(
-            (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$env:gitProfile/master/functions/$name.ps1")
+    foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
+        . (
+            [scriptblock]::Create(
+                [io.file]::ReadAllText($file)
+            )
         )
-    ) 
-}
-function Mount-CloudShell {
-    if ($global:isConnected) {
-        switch ($true) {
-            $isWindows {
-                if (Get-PSDrive -name S -ErrorAction SilentlyContinue) {
-                    Write-Verbose "Found S:\ drive."
-                    return "S:"
-                }
-                else {
-                    $acctUser = $env:storagePath.split('.')[0]
-                    $acctKey = ConvertTo-SecureString -String $env:storageKey -AsPlainText -Force
-                    $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "Azure\$acctUser", $acctKey
-
-                    try {
-                        New-PSDrive -Name S -PSProvider FileSystem -Root "\\$env:storagePath" -Credential $credential -Persist -Scope Global -ErrorAction Stop
-                        Write-Verbose "Mapped drive \\$env:storagePath using $($credential.UserName)"
-                        return "S:"
-                    }
-                    catch {
-                        Write-Host -ForegroundColor Darkred "Error mapping cloudshell drive at $env:storagePath."
-                        return split-path($env:LocalGitProfile).tostring()
-                    }
-                }                
-            }
-            $isLinux {
-                if (Get-PSDrive -name "cloudshell" -ErrorAction SilentlyContinue) {
-                    return "$home/cloudshell"
-                }
-                else {
-                    $acctUser = $env:storagePath.split('.')[0]
-                    $acctKey = ConvertTo-SecureString -String $env:storageKey -AsPlainText -Force
-                    $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "Azure\$acctUser", $acctKey
-
-                    try {
-                        # apparently New-PSDrive is still pretty broken, per https://github.com/PowerShell/PowerShell/issues/6629
-                        #New-PSDrive -Name S -PSProvider FileSystem -Root "//$env:storagePath/$env:storageShare" -Credential $credential -Persist -Scope Global -ErrorAction Stop
-                        #Write-Verbose "Mapped drive //$env:storagePath\$env:storageShare using $($credential.UserName)"
-
-                        if (-not (test-path "$home/cloudshell")) { new-item -path $home/cloudshell -ItemType Directory | Out-Null }
-                        try {
-                            Invoke-Expression "sudo mount -t cifs -o username=$credential.UserName,password=$env:storageKey //$env:storagePath $home/cloudshell" -ErrorAction Stop
-                        }
-                        catch {
-                            Write-Host -ForegroundColor DarkRed "Error mapping cloudshell drive at $env:storagePath."
-                            return split-path($env:LocalGitProfile).tostring()
-                        }
-                        Write-Verbose "Mapped drive \\$env:storagePath using $($credential.UserName)"
-                        return "$home/cloudshell"
-                    }
-                    catch {
-                        Write-Host -ForegroundColor Darkred "Error mapping cloudshell drive at $env:storagePath."
-                        return split-path($env:LocalGitProfile).tostring()
-                    }
-                }                
-            }
-            $IsMacOS {
-                Write-Host "Cloud Shell Mapping not yet enabled for MacOS, sorry."
-                return split-path($env:LocalGitProfile).tostring()
-            }
-        }    
     }
-    else { return $null }
 }
 #endregion functions
 
@@ -136,7 +74,8 @@ switch ($global:isConnected) {
         if ($env:LocalGitProfile) {
             
             #env:storageKey means we're persisting a cloudshell
-            if ($env:storageKey) { $cloudShell = Mount-CloudShell; write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root }
+            if ($env:storageKey) { 
+                $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root }
 
             write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
@@ -192,7 +131,7 @@ if (-not $isAdmin) {
 }
 
 #OLD/FUTURE USE CODE
-# if you want to add functions you can added scripts to your
+# if you want to add functions you can add scripts to your
 # powershell profile functions directory or you can inline them
 # in this file. Ignoring the dot source of any tests
 #write-host "Re-loading functions."

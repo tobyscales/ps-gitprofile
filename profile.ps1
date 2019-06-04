@@ -13,7 +13,7 @@ function Update-GitProfile {
     #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
 
     #$ErrorActionPreference = 'SilentlyContinue'
-    if (-not $isConnected) {
+    if (-not $global:isConnected) {
         if ($PSVersionTable.PSVersion.Major -ge 6) { $global:isConnected = (test-connection "windows.net" -TCPPort 80 -quiet) } else { $global:isConnected = (Test-Connection 1.1.1.1 -count 1 -Quiet) }
     }
     
