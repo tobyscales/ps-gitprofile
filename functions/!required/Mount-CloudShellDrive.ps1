@@ -7,7 +7,7 @@ function Mount-CloudShellDrive {
 
     $acctKey = ConvertTo-SecureString -String $storageKey -AsPlainText -Force
     $credential = New-Object System.Management.Automation.PSCredential -ArgumentList "Azure\$storageAcct", $acctKey
-    $storagePath=(Join-Path $storageAcct, $shareName)
+    $storagePath=(Join-Path $storageAcct $shareName)
 
     switch ($true) {
         $isWindows {
