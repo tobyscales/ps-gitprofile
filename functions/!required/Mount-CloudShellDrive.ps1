@@ -33,6 +33,7 @@ function Mount-CloudShellDrive {
                 return "$home/cloudshell"
             }
             else {
+
                 try {
                     # apparently New-PSDrive is still pretty broken, per https://github.com/PowerShell/PowerShell/issues/6629
                     #New-PSDrive -Name S -PSProvider FileSystem -Root "//$env:storagePath/$env:storageShare" -Credential $credential -Persist -Scope Global -ErrorAction Stop
@@ -40,10 +41,11 @@ function Mount-CloudShellDrive {
 
                     if (-not (test-path "$home/cloudshell")) { new-item -path $home/cloudshell -ItemType Directory | Out-Null }
                     try {
-                        Invoke-Expression "sudo mount -t cifs -o username=$credential.UserName,password=$storageKey //$storagePath $home/cloudshell" -ErrorAction Stop
+                        Invoke-Expression "sudo mount -t cifs -o username=$credential.UserName,password=$storageKey //$storageAcct.file.core.windows.net/$shareName $home/cloudshell" -ErrorAction Stop
                     }
                     catch {
-                        Write-Host -ForegroundColor DarkRed "Error mapping cloudshell drive at $storagePath."
+                        Write-Host -ForegroundColor DarkRed "Error mapping cloudshell drive at //$storageAcct.file.core.windows.net/$shareName."
+                        write-host -ForegroundColor Yellow "Do you have the cifs-utils package installed?`nUbuntu\Debian: sudo apt-get install cifs-utils`nCentOS\RHEL: sudo yum install cifs-utils"
                         return split-path($env:LocalGitProfile).tostring()
                     }
                     Write-Verbose "Mapped drive \\$storagePath using $($credential.UserName)"
