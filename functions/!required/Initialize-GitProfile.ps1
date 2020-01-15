@@ -3,7 +3,7 @@ function global:Set-GitProfile {
     param([Parameter( Mandatory, ValueFromPipeline = $true)]
         [String[]]$gitProfileURL)
         
-    if (-not (test-path $profile)) { New-Item -ItemType File -Path $profile -Force  | Out-Null } 
+    if (-not (test-path $profile)) { New-Item -ItemType File -Path $profile -Force | Out-Null } 
     Get-GitProfile $gitProfileURL > $profile
 }
 function global:Get-GitProfile {
@@ -12,11 +12,44 @@ function global:Get-GitProfile {
     
     return (New-Object System.Net.WebClient).DownloadString($gitProfileURL)
 }
+function global:Backup-CurrentProfile {
+    $backupPath = join-path (split-path $profile) "backup"
+    $backupProfile = (split-path -leaf $profile)
+    New-Item -ItemType Directory $backupPath -Force | out-null
+    Copy-Item $profile -destination (join-path $backupPath $backupProfile)
+    return (join-path $backupPath $backupProfile)
+}
+
+function global:Uninstall-GitProfile {
+
+    #remove GitProfile objects
+    if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
+
+    Remove-Item -Path "$here" -Recurse -force
+    Remove-Item -Path "$home\.gitprofile" -Recurse -force
+    Remove-Item -Path $env:LocalGitProfile -force
+
+    #restore previous PSProfile
+    if (-not $env:backupProfile) {
+        $backupPath = join-path (split-path $profile) "backup"
+    } else { $backupPath = $env:backupProfile}
+
+    Copy-Item $backupPath -destination $profile -Force
+    write-host ""
+    while ("Y", "N" -notcontains $configureMachine.toUpper()) {
+        $okToRestore = Read-Host "Restored from $backupPath.`nOK to remove backup directory?"
+        switch ($okToRestore.toUpper()) {
+            "Y" { Remove-Item -Path (split-path $backupPath) -Recurse -force }
+            "N" { }
+        }
+    }
+}
+
 function global:Initialize-GitProfile {
     param(
         [Parameter(  
             ValueFromPipeline = $true)]
-        [String[]]$gitProfile=$env:gitProfile)
+        [String[]]$gitProfile = $env:gitProfile)
 
     $configureMachine = ""
     $useCloudShell = ""
@@ -34,9 +67,10 @@ function global:Initialize-GitProfile {
                 Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
                 
-             }
+            }
             "Y" {
-                
+                $env:backupProfile = global:Backup-CurrentProfile
+
                 Set-GitProfile $profileURL
 
                 while ("Y", "N" -notcontains $useCloudShell.toUpper()) {
@@ -53,6 +87,7 @@ function global:Initialize-GitProfile {
 
                             $envVars = [ordered]@{
                                 '$env:gitProfile'      = "$gitProfile"
+                                '$env:backupProfile'   = "$backupProfile"
                                 '$env:storagePath'     = "$storageAcct\$storageShare"
                                 '$env:storageKey'      = $storageKey
                                 #TODO: put cloudshell into path or alias to 
@@ -69,7 +104,7 @@ function global:Initialize-GitProfile {
                     }
                 }
 
-                New-Item -ItemType File -Path "$home\.gitprofile\secrets.ps1" -Force  | Out-Null
+                New-Item -ItemType File -Path "$home\.gitprofile\secrets.ps1" -Force | Out-Null
 
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
                 $envVars.GetEnumerator() | ForEach-Object {
