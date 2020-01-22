@@ -31,7 +31,7 @@ function global:Uninstall-GitProfile {
     
     #get previous PSProfile path
     if (-not $env:backupProfile) {
-        $backupProfileName = join-path $backupPath (get-item $backupPath -filter *.ps1) #"backup/*.ps1"
+        $backupProfileName = join-path $backupPath (Get-ChildItem $backupPath *.ps1).Name #"backup/*.ps1"
     }
     else { $backupProfileName = $env:backupProfile }
 

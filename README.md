@@ -25,7 +25,6 @@ This will also give you the option to automount your Azure Cloud Shell drive on 
 Finally, for advanced users you can clone this repo and change the $env:gitProfile variable at the top of profile.ps1 to point all the defaults to your repository instead. 
 
 #TODO:
-* Add current profile/config restore and backup for a cleaner uninstall experience
 * Add ability to update profile.ps1 after initial setup
 * Cleanup logic in Import-GitFunction to allow case mismatches
 * Add git support for 2-way sync
