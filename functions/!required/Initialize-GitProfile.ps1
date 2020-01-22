@@ -17,7 +17,7 @@ function global:Backup-CurrentProfile {
     $backupProfileName = (split-path -leaf $profile)
     New-Item -ItemType Directory $backupPath -Force | out-null
 
-    Get-ChildItem -exclude "backup" | Copy-Item -destination $backupPath -Recurse
+    Get-ChildItem (split-path $profile) -exclude "backup" | Copy-Item -destination $backupPath -Recurse
 
     return (join-path $backupPath $backupProfileName)
 }
@@ -27,11 +27,11 @@ function global:Uninstall-GitProfile {
     $backupPath = (join-path $here "backup")
     $functionPath = (join-path $here "functions")
     $scriptPath = (join-path $here "scripts")
-    [string]$removeAll
+    [string[]]$removeAll
     
     #get previous PSProfile path
     if (-not $env:backupProfile) {
-        $profileName = (Get-ChildItem $backupPath *.ps1).Name
+        $profileName = (split-path -leaf $profile)
         $backupProfileName = join-path $backupPath $profileName
     }
     else { $backupProfileName = $env:backupProfile }
