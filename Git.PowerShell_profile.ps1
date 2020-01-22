@@ -17,6 +17,7 @@ function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 function Import-LocalFunctions {
     $functionpath = (join-path $here -childpath "functions")
+    New-Item -ItemType Directory $functionpath -Force | Out-Null
 
     foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
         . (
@@ -81,8 +82,8 @@ switch ($global:isConnected) {
 
             #TODO: check for existence of git, use git clone where applicable to allow 2-way sync
             #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
-            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
-            New-Runspace -runspacename "PS Clone" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
+            New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
+            New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
             
             . Import-LocalFunctions
         }
