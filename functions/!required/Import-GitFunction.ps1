@@ -12,3 +12,4 @@ function global:Import-GitFunction {
         )
     )
 }
+Set-Alias igf global:Import-GitFunction
