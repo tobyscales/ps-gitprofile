@@ -25,9 +25,7 @@ function global:Uninstall-GitProfile {
     #remove GitProfile objects
     if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
 
-    Remove-Item -Path "$here" -Recurse -force
-    Remove-Item -Path "$home\.gitprofile" -Recurse -force
-    Remove-Item -Path $env:LocalGitProfile -force
+    # Remove-Item -Path "$here" -Recurse -force
 
     #restore previous PSProfile
     if (-not $env:backupProfile) {
@@ -35,14 +33,17 @@ function global:Uninstall-GitProfile {
     } else { $backupPath = $env:backupProfile}
 
     Copy-Item $backupPath -destination $profile -Force
-    write-host ""
-    while ("Y", "N" -notcontains $configureMachine.toUpper()) {
-        $okToRestore = Read-Host "Restored from $backupPath.`nOK to remove backup directory?"
-        switch ($okToRestore.toUpper()) {
-            "Y" { Remove-Item -Path (split-path $backupPath) -Recurse -force }
-            "N" { }
-        }
-    }
+    Remove-Item -Path "$home\.gitprofile" -Recurse -force
+    Remove-Item -Path $env:LocalGitProfile -force
+
+    # write-host ""
+    # while ("Y", "N" -notcontains $configureMachine.toUpper()) {
+    #     $okToRestore = Read-Host "Restored from $backupPath.`nOK to remove backup directory?"
+    #     switch ($okToRestore.toUpper()) {
+    #         "Y" { Remove-Item -Path (split-path $backupPath) -Recurse -force }
+    #         "N" { }
+    #     }
+    # }
 }
 
 function global:Initialize-GitProfile {
