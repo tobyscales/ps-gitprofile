@@ -31,12 +31,13 @@ function global:Uninstall-GitProfile {
     
     #get previous PSProfile path
     if (-not $env:backupProfile) {
-        $backupProfileName = join-path $backupPath (Get-ChildItem $backupPath *.ps1).Name #"backup/*.ps1"
+        $profileName = (Get-ChildItem $backupPath *.ps1).Name
+        $backupProfileName = join-path $backupPath $profileName
     }
     else { $backupProfileName = $env:backupProfile }
 
     while ("Y", "N" -notcontains $removeAll.toUpper()) {
-        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`n`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`n`nOK to proceed?"
+        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`n`nOK to proceed?"
         switch ($removeAll.toUpper()) {
             "Y" {
                 Copy-Item $backupProfileName -destination $profile -Force
