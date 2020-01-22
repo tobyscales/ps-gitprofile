@@ -28,10 +28,10 @@ function global:Uninstall-GitProfile {
     }
     else { $backupPath = $env:backupProfile }
     
-    # while ("Y", "N" -notcontains $removeAll.toUpper()) {
-    #     $removeAll = Read-Host "This will restore your profile at $backupPath and remove all objects in these directories: `n$here\functions `n$here\backup `n$here\scripts `n`nOK to proceed?"
-    #     switch ($removeAll.toUpper()) {
-    #         "Y" {
+    while ("Y", "N" -notcontains $removeAll.toUpper()) {
+        $removeAll = Read-Host "This will restore your profile at $backupPath and remove all objects in these directories: `n$here\functions `n$here\backup `n$here\scripts `n`nOK to proceed?"
+        switch ($removeAll.toUpper()) {
+            "Y" {
                 Copy-Item $backupPath -destination "$(split-path($profile))" -Force
                 Remove-Item -Path "$home\.gitprofile" -Recurse -force
                 Remove-Item -Path $env:LocalGitProfile -force
@@ -39,12 +39,12 @@ function global:Uninstall-GitProfile {
                 # if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
     
                 Remove-Item -Path "$here\backup" -Recurse -Force 
-                Remove-Item -Path "$here\functions" -Recurse -Force -Confirm
-                Remove-Item -Path "$here\scripts" -Recurse -Force -Confirm
+                Remove-Item -Path "$here\functions" -Recurse -Force #-Confirm
+                Remove-Item -Path "$here\scripts" -Recurse -Force #-Confirm
                 #Get-ChildItem -Directory $here | Remove-Item -Recurse
-        #     }
-        #     "N" { }
-        # }
+            }
+            "N" { }
+        }
     }
 
     function global:Initialize-GitProfile {
