@@ -76,7 +76,7 @@ function global:Uninstall-GitProfile {
                     Set-GitProfile $profileURL
 
                     while ("Y", "N" -notcontains $useCloudShell.toUpper()) {
-                        $useCloudShell = Read-Host "Would you like to automatically map your Azure Cloud Shell drive?"
+                        $useCloudShell = Read-Host "Would you like to automatically mount your Azure Cloud Shell drive?"
         
                         switch ($useCloudShell.toUpper()) {
                             "Y" {
