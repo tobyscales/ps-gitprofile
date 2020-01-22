@@ -24,7 +24,9 @@ function global:Backup-CurrentProfile {
 
 function global:Uninstall-GitProfile {
 
-    $backupPath = join-path $here "backup"
+    $backupPath = (join-path $here "backup")
+    $functionPath= (join-path $here "functions")
+    $scriptPath= (join-path $here "scripts")
     $removeAll = "null"
     
     #get previous PSProfile path
@@ -32,10 +34,9 @@ function global:Uninstall-GitProfile {
         $backupProfileName = join-path $backupPath (get-item $backupPath -filter *.ps1) #"backup/*.ps1"
     }
     else { $backupProfileName = $env:backupProfile }
-    
 
     while ("Y", "N" -notcontains $removeAll.toUpper()) {
-        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath. It will also remove all objects in these directories: `n$here\functions `n$here\backup `n$here\scripts `n`nOK to proceed?"
+        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`n`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`n`nOK to proceed?"
         switch ($removeAll.toUpper()) {
             "Y" {
                 Copy-Item $backupProfileName -destination $profile -Force
