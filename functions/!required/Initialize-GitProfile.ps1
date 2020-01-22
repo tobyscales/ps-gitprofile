@@ -27,7 +27,7 @@ function global:Uninstall-GitProfile {
     $backupPath = (join-path $here "backup")
     $functionPath = (join-path $here "functions")
     $scriptPath = (join-path $here "scripts")
-    $removeAll = "null"
+    [string]$removeAll
     
     #get previous PSProfile path
     if (-not $env:backupProfile) {
