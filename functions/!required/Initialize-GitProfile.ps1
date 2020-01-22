@@ -25,8 +25,8 @@ function global:Backup-CurrentProfile {
 function global:Uninstall-GitProfile {
 
     $backupPath = (join-path $here "backup")
-    $functionPath= (join-path $here "functions")
-    $scriptPath= (join-path $here "scripts")
+    $functionPath = (join-path $here "functions")
+    $scriptPath = (join-path $here "scripts")
     $removeAll = "null"
     
     #get previous PSProfile path
@@ -54,7 +54,9 @@ function global:Uninstall-GitProfile {
                 Remove-Item -Path $env:LocalGitProfile -force
                 #Get-ChildItem -Directory $here | Remove-Item -Recurse
             }
-            "N" { }
+            "N" {
+                write-host "Operation cancelled."
+            }
         }
     }
 }
