@@ -16,31 +16,39 @@ function global:Backup-CurrentProfile {
     $backupPath = join-path (split-path $profile) "backup"
     $backupProfileName = (split-path -leaf $profile)
     New-Item -ItemType Directory $backupPath -Force | out-null
-    Copy-Item $profile -destination (join-path $backupPath $backupProfileName)
+
+    Copy-Item (split-path $profile) -destination $backupPath -Recurse
+
     return (join-path $backupPath $backupProfileName)
 }
 
 function global:Uninstall-GitProfile {
 
+    $backupPath = join-path $here "backup"
+
     #get previous PSProfile path
     if (-not $env:backupProfile) {
-        $backupPath = join-path $here "backup/*.ps1"
+        $backupProfileName = join-path $backupPath (get-item $backupPath -filter *.ps1) #"backup/*.ps1"
     }
-    else { $backupPath = $env:backupProfile }
+    else { $backupProfileName = $env:backupProfile }
     
+
     while ("Y", "N" -notcontains $removeAll.toUpper()) {
-        $removeAll = Read-Host "This will restore your profile at $backupPath and remove all objects in these directories: `n$here\functions `n$here\backup `n$here\scripts `n`nOK to proceed?"
+        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath. It will also remove all objects in these directories: `n$here\functions `n$here\backup `n$here\scripts `n`nOK to proceed?"
         switch ($removeAll.toUpper()) {
             "Y" {
-                Copy-Item $backupPath -destination "$(split-path($profile))" -Force
-                Remove-Item -Path "$home\.gitprofile" -Recurse -force
-                Remove-Item -Path $env:LocalGitProfile -force
+                Copy-Item $backupProfileName -destination $profile -Force
+                Copy-Item $backupPath -destination "$(split-path($profile))" -Force -Recurse
+                
                 # #remove GitProfile objects
                 # if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
     
                 Remove-Item -Path "$here\backup" -Recurse -Force 
                 Remove-Item -Path "$here\functions" -Recurse -Force #-Confirm
                 Remove-Item -Path "$here\scripts" -Recurse -Force #-Confirm
+
+                Remove-Item -Path "$home\.gitprofile" -Recurse -force
+                Remove-Item -Path $env:LocalGitProfile -force
                 #Get-ChildItem -Directory $here | Remove-Item -Recurse
             }
             "N" { }
