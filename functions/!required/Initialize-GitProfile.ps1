@@ -14,10 +14,10 @@ function global:Get-GitProfile {
 }
 function global:Backup-CurrentProfile {
     $backupPath = join-path (split-path $profile) "backup"
-    $backupProfile = (split-path -leaf $profile)
+    $backupProfileName = (split-path -leaf $profile)
     New-Item -ItemType Directory $backupPath -Force | out-null
-    Copy-Item $profile -destination (join-path $backupPath $backupProfile)
-    return (join-path $backupPath $backupProfile)
+    Copy-Item $profile -destination (join-path $backupPath $backupProfileName)
+    return (join-path $backupPath $backupProfileName)
 }
 
 function global:Uninstall-GitProfile {
@@ -29,10 +29,10 @@ function global:Uninstall-GitProfile {
 
     #restore previous PSProfile
     if (-not $env:backupProfile) {
-        $backupPath = join-path (split-path $profile) "backup"
+        $backupPath = join-path $here "backup"
     } else { $backupPath = $env:backupProfile}
 
-    Copy-Item $backupPath -destination $profile -Force
+    Copy-Item "$backupPath/*.ps1" -destination "$(split-path($profile))" -Force
     Remove-Item -Path "$home\.gitprofile" -Recurse -force
     Remove-Item -Path $env:LocalGitProfile -force
 
