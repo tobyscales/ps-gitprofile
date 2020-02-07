@@ -40,7 +40,7 @@ function global:Uninstall-GitProfile {
         $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`n`nOK to proceed?"
         switch ($removeAll.toUpper()) {
             "Y" {
-                Copy-Item $backupProfileName -destination $profile -Force
+                #Copy-Item $backupProfileName -destination $profile -Force
                 Copy-Item $backupPath -destination "$(split-path($profile))" -Force -Recurse
                 
                 # #remove GitProfile objects
