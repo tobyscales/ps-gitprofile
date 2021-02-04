@@ -1,13 +1,14 @@
+#using & because gcloud on Windows actually calls gcloud.ps1
 function Run-gcloud {
     if ($args[0] -eq "c") {
     $drop, $keep = $args #https://stackoverflow.com/questions/24754822/powershell-remove-item-0-from-an-array
         if ($args[1] -eq "i") {
             $drop, $keep = $keep
-            . gcloud compute instances $keep } else {
-        . gcloud compute $keep }
+            & gcloud compute instances $keep } else {
+        & gcloud compute $keep }
+    } else {
+    & gcloud $args
     }
-    . gcloud $args
-    write-host "gcloud"
 }
 
 Set-Alias g Run-gcloud
