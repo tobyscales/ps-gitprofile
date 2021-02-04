@@ -1,4 +1,4 @@
-#using & because gcloud on Windows actually calls gcloud.ps1
+#using iex because gcloud on Windows actually calls gcloud.ps1
 function Run-gcloud {
     if ($args[0] -eq "c") {
     $drop, $keep = $args #https://stackoverflow.com/questions/24754822/powershell-remove-item-0-from-an-array
@@ -11,4 +11,8 @@ function Run-gcloud {
     }
 }
 
+function Run-gsutil {
+    . gsutil $args
+}
 Set-Alias g Run-gcloud
+Set-Alias gs Run-gsutil
