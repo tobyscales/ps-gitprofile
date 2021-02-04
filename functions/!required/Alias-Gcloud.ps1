@@ -7,7 +7,7 @@ function Run-gcloud {
             & gcloud compute instances $keep } else {
         & gcloud compute $keep }
     } else {
-    & gcloud $args
+    . gcloud $args
     }
 }
 
