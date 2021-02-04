@@ -5,8 +5,9 @@ function Run-gcloud {
             $drop, $keep = $keep
             . gcloud compute instances $keep } else {
         . gcloud compute $keep }
-    . gcloud $args
     }
+    . gcloud $args
+    write-host "gcloud"
 }
 
 Set-Alias g Run-gcloud
