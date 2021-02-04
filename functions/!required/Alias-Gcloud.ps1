@@ -4,10 +4,10 @@ function Run-gcloud {
     $drop, $keep = $args #https://stackoverflow.com/questions/24754822/powershell-remove-item-0-from-an-array
         if ($args[1] -eq "i") {
             $drop, $keep = $keep
-            & gcloud compute instances $keep } else {
-        & gcloud compute $keep }
+            iex "gcloud compute instances $keep" } else {
+        iex "gcloud compute $keep" }
     } else {
-    . gcloud $args
+    iex "gcloud $args"
     }
 }
 
