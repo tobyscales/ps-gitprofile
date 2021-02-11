@@ -1,10 +1,12 @@
-if (-not $env:gitProfile) { $env:gitProfile = "tescales/ps-gitprofile" }
+if (-not $env:gitProfile) { $env:gitProfile = "tobyscales/ps-gitprofile" }
+$env:GIT_AUTHOR_NAME="tobyscales"
+$env:GIT_AUTHOR_EMAIL="vscode@github.com"
 
 function Update-GitProfile {
     param([Parameter(ValueFromPipeline = $true)]
         [String[]]$gitProfile = $env:gitProfile)
 
-    $initURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/!required/Initialize-GitProfile.ps1"
+    $getGitURL     = "https://raw.githubusercontent.com/$gitProfile/master/functions/!required/Get-GitProfile.ps1"
     $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
 
     #TODO: use runspaces for faster loading?
@@ -18,7 +20,7 @@ function Update-GitProfile {
     }
     
     if ($global:isConnected) { 
-        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($initURL))
+        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGitURL))
 
         if (test-path $home\.gitprofile\secrets.ps1) {
             & "$home\.gitprofile\secrets.ps1"
