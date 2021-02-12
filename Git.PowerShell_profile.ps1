@@ -48,8 +48,9 @@ if ($env:LocalGitProfile -and $isConnected) {
     }
     write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
-    #TODO: use git to allow 2-way sync?
-    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
+    . import-gitfunction get-gitfiles
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath "$here\functions"
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath "$here\scripts"
     #New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
     #New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
 }
