@@ -63,7 +63,8 @@ switch ($global:isConnected) {
             New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
             . global:Import-LocalFunctions
         }            
-        . global:Import-RequiredFunctions $env:gitProfile
+        # only import-required if it's a transient install
+        #. global:Import-RequiredFunctions $env:gitProfile
         
         #else {
         # Non-persistent function loader
