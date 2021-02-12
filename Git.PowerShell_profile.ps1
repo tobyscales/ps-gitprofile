@@ -20,6 +20,7 @@ function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 $here = (split-path $profile)
 $isAdmin = $false
+$isTransient = $true
 
 #write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
 

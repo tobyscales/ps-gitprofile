@@ -11,18 +11,6 @@ function global:Get-GitProfile {
     
     return (New-Object System.Net.WebClient).DownloadString($gitProfileURL)
 }
-function global:Import-LocalFunctions {
-    $functionpath = (join-path $here -childpath "functions")
-    New-Item -ItemType Directory $functionpath -Force | Out-Null
-
-    foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
-        . (
-            [scriptblock]::Create(
-                [io.file]::ReadAllText($file)
-            )
-        )
-    }
-}
 function global:Import-RequiredFunctions {
     param([Parameter( ValueFromPipeline = $true)]
         [String[]]$gitProfile)
