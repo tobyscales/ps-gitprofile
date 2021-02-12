@@ -5,12 +5,7 @@
 #     if (-not (test-path $profile)) { New-Item -ItemType File -Path $profile -Force | Out-Null } 
 #     Get-GitProfile $gitProfileURL > $profile
 # }
-function global:Get-GitProfile {
-    param([Parameter( Mandatory, ValueFromPipeline = $true)]
-        $gitProfileURL)
-    
-    return (New-Object System.Net.WebClient).DownloadString($gitProfileURL)
-}
+
 function global:Import-RequiredFunctions {
     param([Parameter( ValueFromPipeline = $true)]
         $gitProfile = $env:gitProfile)

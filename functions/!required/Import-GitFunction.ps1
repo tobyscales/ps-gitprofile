@@ -12,6 +12,6 @@ function global:Import-GitFunction {
     write-host "Importing $functionName from $url"
     #invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
     $sb = [scriptblock]::Create((New-Object System.Net.WebClient).DownloadString($url))
-    . $sb
+    $sb | iex
 }
 Set-Alias igf global:Import-GitFunction
