@@ -1,18 +1,7 @@
-function global:Import-LocalFunctions {
-    $functionpath = (join-path $here -childpath "functions")
-    New-Item -ItemType Directory $functionpath -Force | Out-Null
-
-    foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
-        . (
-            [scriptblock]::Create(
-                [io.file]::ReadAllText($file)
-            )
-        )
-    }
-}
 function global:Import-GitFunction {
     Param(
-        [string]$functionName
+        [string]$functionName,
+        [string]$gitProfile = $env:gitProfile
     )
     if (-not $functionName.endswith(".ps1")) { $functionName += ".ps1"}
     $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/functions"
@@ -26,4 +15,3 @@ function global:Import-GitFunction {
     . $sb
 }
 Set-Alias igf global:Import-GitFunction
-Set-Alias ilf global:Import-LocalFunctions
