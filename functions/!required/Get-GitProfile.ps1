@@ -1,10 +1,10 @@
-function global:Set-GitProfile {
-    param([Parameter( Mandatory, ValueFromPipeline = $true)]
-        $gitProfileURL)
+# function global:Set-GitProfile {
+#     param([Parameter( Mandatory, ValueFromPipeline = $true)]
+#         $gitProfileURL)
         
-    if (-not (test-path $profile)) { New-Item -ItemType File -Path $profile -Force | Out-Null } 
-    Get-GitProfile $gitProfileURL > $profile
-}
+#     if (-not (test-path $profile)) { New-Item -ItemType File -Path $profile -Force | Out-Null } 
+#     Get-GitProfile $gitProfileURL > $profile
+# }
 function global:Get-GitProfile {
     param([Parameter( Mandatory, ValueFromPipeline = $true)]
         $gitProfileURL)

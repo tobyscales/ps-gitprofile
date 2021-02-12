@@ -28,18 +28,13 @@ function global:Uninstall-GitProfile {
         switch ($removeAll.toUpper()) {
             "Y" {
                 Copy-Item $backupProfileName -destination $profile -Force
-                Copy-Item $backupPath -destination "$(split-path($profile))" -Force -Recurse -Exclude '/backup'
+                Copy-Item $backupPath -destination "$(split-path($profile))" -Force -Recurse -Exclude 'backup' -whatif
                 
-                # #remove GitProfile objects
-                # if ($env:LocalGitProfile) { $here = split-path($env:LocalGitProfile) } else { $here = split-path($profile) }
-    
-                Remove-Item -Path "$here\backup" -Recurse -Force 
-                Remove-Item -Path "$here\functions" -Recurse -Force #-Confirm
-                Remove-Item -Path "$here\scripts" -Recurse -Force #-Confirm
+                Remove-Item -Path "$here\backup" -Recurse -Force -ErrorAction $continue
+                Remove-Item -Path "$here\functions" -Recurse -Force 
+                Remove-Item -Path "$here\scripts" -Recurse -Force 
 
-                Remove-Item -Path "$home\.gitprofile" -Recurse -force
                 Remove-Item -Path $env:LocalGitProfile -force
-                #Get-ChildItem -Directory $here | Remove-Item -Recurse
             }
             "N" {
                 write-host "Operation cancelled."
@@ -58,31 +53,35 @@ function global:Initialize-GitProfile {
     $useCloudShell = ""
     $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
     $profileURL = "https://raw.githubusercontent.com/$gitProfile/master/profile.ps1"
-    #$invokeRFURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Invoke-RequiredFunctions.ps1"
 
     $envVars = @{ }
 
     while ("Y", "N" -notcontains $configureMachine.toUpper()) {
-        $configureMachine = Read-Host "Always use `n--->$gitProfileURL`nas your PowerShell profile?`n(CAUTION: WILL OVERWRITE EXISTING PROFILE)"
+        $configureMachine = Read-Host "Always use `n--->$gitProfileURL`nas your PowerShell profile?`n(Run Uninstall-GitProfile to revert changes.)"
         switch ($configureMachine.toUpper()) {
             "N" { 
                 . global:Import-RequiredFunctions $gitProfile
                 #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
-                
             }
             "Y" {
                 $env:backupProfile = global:Backup-CurrentProfile
 
-                Set-GitProfile $profileURL
+                #if (-not (test-path $profile)) { New-Item -ItemType File -Path $profile -Force | Out-Null } 
+                (New-Object System.Net.WebClient).DownloadString($profileURL) > $profile
 
+                $env:gitProfile      = "$gitProfile"
+                $env:backupProfile   = "$backupProfile"
+                $env:LocalGitProfile = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
+
+                #persist the values in profile
                 $envVars = [ordered]@{
-                    '$env:gitProfile'      = "$gitProfile"
-                    '$env:backupProfile'   = "$backupProfile"
-                    '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
+                '$env:gitProfile'      = "$gitProfile"
+                '$env:backupProfile'   = "$backupProfile"
+                '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
                 }
                 while ("Y", "N" -notcontains $useCloudShell.toUpper()) {
-                    $useCloudShell = Read-Host "Would you like to automatically mount your Azure Cloud Shell drive?"
+                    $useCloudShell = Read-Host "Would you like to automatically mount your Azure Cloud Shell drive?`n(WARNING: Will save Storage Key in plaintext to your profile.)"
         
                     switch ($useCloudShell.toUpper()) {
                         "Y" {
@@ -96,17 +95,13 @@ function global:Initialize-GitProfile {
                             $envVars += [ordered]@{
                                 '$env:storagePath'     = "$storageAcct\$storageShare"
                                 '$env:storageKey'      = $storageKey
-                                #TODO: put cloudshell into path or alias to 
+                                #TODO: put cloudshell into path, or at least alias to it?
                             }
                         }
-                        "N" { 
-
-                        }
+                        "N" { }
                         default { $useCloudShell = Read-Host "Please enter Y or N" }
                     }
                 }
-
-                #New-Item -ItemType File -Path "$home\.gitprofile\secrets.ps1" -Force | Out-Null
 
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
                 $envVars.GetEnumerator() | ForEach-Object {
@@ -114,9 +109,6 @@ function global:Initialize-GitProfile {
                 }
 
                 #& "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-                . $profile
-                #& [scriptblock]::Create($envVars)
-
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
                 . $env:LocalGitProfile
             }
