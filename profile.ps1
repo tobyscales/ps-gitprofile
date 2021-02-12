@@ -59,12 +59,6 @@ function global:Import-RequiredFunctions {
 }
 function global:Import-GitFunction {
     Param(
-        [string]$functionName
-    )
-    . ( Import-GF $functionName)
-}
-function Import-GF {
-    Param(
         [string]$functionName,
         [string]$gitProfile = $env:gitProfile
     )
@@ -82,12 +76,6 @@ function Import-GF {
     return [scriptblock]::Create((New-Object System.Net.WebClient).DownloadString($url))
     #New-Item -Path Function:$funcName -Value $fDef -options AllScope
 }
-# function Get-GitProfile {
-#     param([Parameter( Mandatory, ValueFromPipeline = $true)]
-#         $gitProfileURL)
-    
-#     return (New-Object System.Net.WebClient).DownloadString($gitProfileURL)
-# }
 . ( Update-GitProfile )
 global:Import-RequiredFunctions
 Set-Alias igf global:Import-GitFunction
