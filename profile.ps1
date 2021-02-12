@@ -69,12 +69,7 @@ function global:Import-GitFunction {
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
 
     write-host "Importing $functionName from $url"
-    #invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
-    #$fDef = ((New-Object System.Net.WebClient).DownloadString($url))
-    #$funcName = ($functionname.split('.')[0])
-    #New-Item -Path Function:$funcName -Value $fDef -options AllScope
-    return [scriptblock]::Create((New-Object System.Net.WebClient).DownloadString($url))
-    #New-Item -Path Function:$funcName -Value $fDef -options AllScope
+    (New-Object System.Net.WebClient).DownloadString($url) | Invoke-Expression 
 }
 . ( Update-GitProfile )
 global:Import-RequiredFunctions

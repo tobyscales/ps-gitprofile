@@ -103,8 +103,7 @@ function global:Initialize-GitProfile {
                     "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value | out-file "$profile" -Append -Force
                 }
 
-                #& "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
-                Get-GitProfile $gitProfileURL > $env:LocalGitProfile
+                (New-Object System.Net.WebClient).DownloadString($gitProfileURL) > $env:LocalGitProfile
                 . $env:LocalGitProfile
             }
             "N" { }
