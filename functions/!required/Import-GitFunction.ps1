@@ -21,7 +21,8 @@ function global:Import-GitFunction {
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
     
     write-host "Downloading function $functionName from $url"
-    invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
+    #invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
+    . [scriptblock]::Create((New-Object System.Net.WebClient).DownloadString($url))
 }
 Set-Alias igf global:Import-GitFunction
 Set-Alias ilf global:Import-LocalFunctions

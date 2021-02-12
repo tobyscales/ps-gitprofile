@@ -4,7 +4,7 @@ function global:Backup-CurrentProfile {
     $backupProfileName = (split-path -leaf $profile)
     New-Item -ItemType Directory $backupPath -Force | out-null
 
-    Get-ChildItem (split-path $profile) -exclude "backup" | Copy-Item -destination $backupPath -Recurse
+    Get-ChildItem (split-path $profile) -exclude 'backup' | Copy-Item -destination $backupPath -Recurse
 
     return (join-path $backupPath $backupProfileName)
 }
