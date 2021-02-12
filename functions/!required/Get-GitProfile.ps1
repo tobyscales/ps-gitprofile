@@ -13,7 +13,7 @@ function global:Get-GitProfile {
 }
 function global:Import-RequiredFunctions {
     param([Parameter( ValueFromPipeline = $true)]
-        [String[]]$gitProfile)
+        $gitProfile)
 
     # Load all !required functions
     $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/functions/!required"
