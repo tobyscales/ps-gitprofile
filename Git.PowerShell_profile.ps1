@@ -44,7 +44,7 @@ switch ($global:isConnected) {
         $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
 
-        $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
+        $getGFURL = "https://raw.githubusercontent.com/tobyscales/ps-gitprofile/master/functions/Get-GitFiles.ps1"
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
 
         #env:LocalGitProfile means we're persisting a profile

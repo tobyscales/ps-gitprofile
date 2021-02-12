@@ -58,6 +58,5 @@ function Get-GitFiles {
         & echo $Path >> .git/info/sparse-checkout
         & echo $ExcludePath >> .git/info/sparse-checkout
         & git pull origin master
-        }
     }
 }
