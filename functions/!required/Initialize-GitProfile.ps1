@@ -76,6 +76,11 @@ function global:Initialize-GitProfile {
 
                 Set-GitProfile $profileURL
 
+                $envVars = [ordered]@{
+                    '$env:gitProfile'      = "$gitProfile"
+                    '$env:backupProfile'   = "$backupProfile"
+                    '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
+                }
                 while ("Y", "N" -notcontains $useCloudShell.toUpper()) {
                     $useCloudShell = Read-Host "Would you like to automatically mount your Azure Cloud Shell drive?"
         
@@ -88,33 +93,27 @@ function global:Initialize-GitProfile {
                             #TODO: some better string validation
                             if ($storageAcct -notcontains "file.core.windows.net") { $storageAcct = "$storageAcct.file.core.windows.net" }
 
-                            $envVars = [ordered]@{
-                                '$env:gitProfile'      = "$gitProfile"
-                                '$env:backupProfile'   = "$backupProfile"
+                            $envVars += [ordered]@{
                                 '$env:storagePath'     = "$storageAcct\$storageShare"
                                 '$env:storageKey'      = $storageKey
                                 #TODO: put cloudshell into path or alias to 
-                                '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
                             }
                         }
                         "N" { 
-                            $envVars = [ordered]@{
-                                '$env:gitProfile'      = "$gitProfile"
-                                '$env:LocalGitProfile' = join-path (split-path $profile) -childpath "Git.PowerShell_profile.ps1"
-                            }
+
                         }
                         default { $useCloudShell = Read-Host "Please enter Y or N" }
                     }
                 }
 
-                New-Item -ItemType File -Path "$home\.gitprofile\secrets.ps1" -Force | Out-Null
+                #New-Item -ItemType File -Path "$home\.gitprofile\secrets.ps1" -Force | Out-Null
 
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
                 $envVars.GetEnumerator() | ForEach-Object {
-                    "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value | out-file "$home\.gitprofile\secrets.ps1" -Append -Force
+                    "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value | out-file "$profile" -Append -Force
                 }
 
-                & "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
+                #& "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
                 . $env:LocalGitProfile
             }
