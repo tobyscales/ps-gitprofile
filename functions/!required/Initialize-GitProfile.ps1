@@ -58,7 +58,7 @@ function global:Initialize-GitProfile {
     $useCloudShell = ""
     $gitProfileURL = "https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1"
     $profileURL = "https://raw.githubusercontent.com/$gitProfile/master/profile.ps1"
-    $invokeRFURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Invoke-RequiredFunctions.ps1"
+    #$invokeRFURL = "https://raw.githubusercontent.com/$gitProfile/master/functions/Invoke-RequiredFunctions.ps1"
 
     $envVars = @{ }
 
@@ -66,8 +66,8 @@ function global:Initialize-GitProfile {
         $configureMachine = Read-Host "Always use `n--->$gitProfileURL`nas your PowerShell profile?`n(CAUTION: WILL OVERWRITE EXISTING PROFILE)"
         switch ($configureMachine.toUpper()) {
             "N" { 
-                
-                Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
+                . global:Import-RequiredFunctions $gitProfile
+                #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
                 #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
                 
             }
