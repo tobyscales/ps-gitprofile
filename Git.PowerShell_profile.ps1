@@ -60,10 +60,9 @@ switch ($global:isConnected) {
             #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
             New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
             New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
-
+            . global:Import-LocalFunctions
         }            
         . global:Import-RequiredFunctions $env:gitProfile
-        . global:Import-LocalFunctions
         
         #else {
         # Non-persistent function loader
@@ -81,7 +80,7 @@ switch ($global:isConnected) {
         ##}
         #}
     }
-    $false {
+    $false { #not connected
         $here = (split-path -$env:LocalGitProfile).tostring()
     }
 }
