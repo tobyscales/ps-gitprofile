@@ -38,54 +38,52 @@ switch ($true) {
 
 $gitOwner = split-path ($env:gitProfile)
 $gitRepo = split-path ($env:gitProfile) -leaf
+. global:Import-RequiredFunctions $env:gitProfile
 
-switch ($global:isConnected) {
-    $true {
-        $runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
-        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
-
-        $getGFURL = "https://raw.githubusercontent.com/tobyscales/ps-gitprofile/master/functions/Get-GitFiles.ps1"
-        Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
-
-        #env:LocalGitProfile means we're persisting a profile
-        if ($env:LocalGitProfile) {
-            
-            #env:storageKey means we're persisting a cloudshell
-            if ($env:storageKey) { 
-                $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root 
-            }
-
-            write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
-
-            #TODO: check for existence of git, use git clone where applicable to allow 2-way sync
-            #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
-            New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
-            New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
-            
-        }            
-        # only import-required if it's a transient install
-        . global:Import-RequiredFunctions $env:gitProfile
-        
-        #else {
-        # Non-persistent function loader
-        ##$wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
-        ##$objects = $wr.Content | ConvertFrom-Json
-        ##$files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
-
-        ##foreach ($file in $files) {
-        ##    try {
-        ##       invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-        ##  }
-        ##    catch {
-        ##        throw "Unable to download '$($file.path)'"
-        ##    }
-        ##}
-        #}
+#env:LocalGitProfile means we're persisting a profile
+if ($env:LocalGitProfile -and $isConnected) {
+    #env:storageKey means we're mounting a cloudshell
+    if ($env:storageKey) { 
+        $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root 
     }
-    $false { #not connected
-        $here = (split-path -$env:LocalGitProfile).tostring()
-    }
+    write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
+
+    #TODO: use git to allow 2-way sync?
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
+    #New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
+    #New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
 }
+
+
+#switch ($global:isConnected) {
+#    $true {
+#$runspaceURL = "https://raw.githubusercontent.com/pldmgg/misc-powershell/master/MyFunctions/PowerShellCore_Compatible/New-Runspace.ps1"
+#Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($runspaceURL)) 
+
+#$getGFURL = "https://raw.githubusercontent.com/tobyscales/ps-gitprofile/master/functions/Get-GitFiles.ps1"
+#Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
+
+        
+#else {
+# Non-persistent function loader
+##$wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
+##$objects = $wr.Content | ConvertFrom-Json
+##$files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+
+##foreach ($file in $files) {
+##    try {
+##       invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+##  }
+##    catch {
+##        throw "Unable to download '$($file.path)'"
+##    }
+##}
+#}
+#}
+#$false { #not connected
+ #   $here = (split-path -$env:LocalGitProfile).tostring()
+#}
+#}
 
 write-Verbose "Now running Git.PowerShell from: $here"
 
