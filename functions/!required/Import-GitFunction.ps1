@@ -14,13 +14,19 @@ function global:Import-GitFunction {
     Param(
         [string]$functionName
     )
-    #TODO: add case-insensitivity
-    write-host "Downloading function $functionName from https://raw.githubusercontent.com/$env:gitProfile/master/functions/$functionName.ps1"
+    if (-not $functionName.endswith(".ps1")) { $functionName += ".ps1"}
+    $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/functions"
+    
+    $objects = $wr.Content | ConvertFrom-Json
+    $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
+    
+    write-host "Downloading function $functionName from $url"
     . (
         [scriptblock]::Create(
-            (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$env:gitProfile/master/functions/$functionName.ps1")
+            (New-Object System.Net.WebClient).DownloadString($url)
             
         )
     )
 }
 Set-Alias igf global:Import-GitFunction
+Set-Alias ilf global:Import-LocalFunctions

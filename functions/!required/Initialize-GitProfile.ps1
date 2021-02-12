@@ -24,7 +24,7 @@ function global:Uninstall-GitProfile {
     else { $backupProfileName = $env:backupProfile }
 
     while ("Y", "N" -notcontains $removeAll.toUpper()) {
-        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`n`nOK to proceed?"
+        $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`nOK to proceed?"
         switch ($removeAll.toUpper()) {
             "Y" {
                 Copy-Item $backupProfileName -destination $profile -Force
@@ -57,13 +57,8 @@ function global:Initialize-GitProfile {
     $envVars = @{ }
 
     while ("Y", "N" -notcontains $configureMachine.toUpper()) {
-        $configureMachine = Read-Host "Always use `n--->$gitProfileURL`nas your PowerShell profile?`n(Run Uninstall-GitProfile to revert changes.)"
+        $configureMachine = Read-Host "This will set`n  --->$gitProfileURL`nas your permanent PowerShell profile.`n(Run Uninstall-GitProfile to revert changes.)`n`nOK to proceed?"
         switch ($configureMachine.toUpper()) {
-            "N" { 
-                . global:Import-RequiredFunctions $gitProfile
-                #Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($invokeRFURL))
-                #Invoke-RequiredFunctions -owner (split-path $gitProfile) -repository (split-path $gitProfile -leaf) -Path "functions/!required" 
-            }
             "Y" {
                 $env:backupProfile = global:Backup-CurrentProfile
 
@@ -112,6 +107,7 @@ function global:Initialize-GitProfile {
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
                 . $env:LocalGitProfile
             }
+            "N" { }
             default { $configureMachine = Read-Host "Please enter Y or N" }
         }
     }
