@@ -57,7 +57,7 @@ function global:Initialize-GitProfile {
     $envVars = @{ }
 
     while ("Y", "N" -notcontains $configureMachine.toUpper()) {
-        $configureMachine = Read-Host "This will set`n  --->$gitProfileURL`nas your permanent PowerShell profile.`n(Run Uninstall-GitProfile to revert changes.)`n`nOK to proceed?"
+        $configureMachine = Read-Host "This will permanently set your PowerShell profile to:`n  --->$gitProfileURL`n(Run Uninstall-GitProfile to revert changes.)`n`nOK to proceed?"
         switch ($configureMachine.toUpper()) {
             "Y" {
                 $env:backupProfile = global:Backup-CurrentProfile
