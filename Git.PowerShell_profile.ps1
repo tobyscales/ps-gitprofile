@@ -11,28 +11,17 @@
 
 #$ErrorActionPreference = 'SilentlyContinue'
 
-#region functions
+#region convenience functions
 function which($name) { Get-Command $name | Select-Object Definition }
 function rm-rf($item) { Remove-Item $item -Recurse -Force }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
-function Import-LocalFunctions {
-    $functionpath = (join-path $here -childpath "functions")
-    New-Item -ItemType Directory $functionpath -Force | Out-Null
 
-    foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
-        . (
-            [scriptblock]::Create(
-                [io.file]::ReadAllText($file)
-            )
-        )
-    }
-}
 #endregion functions
 
 $here = (split-path $profile)
 $isAdmin = $false
 
-write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
+#write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
 
 switch ($true) {
     $isWindows {
@@ -57,26 +46,13 @@ switch ($global:isConnected) {
         $getGFURL = "https://raw.githubusercontent.com/$env:gitProfile/master/functions/Get-GitFiles.ps1"
         Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($getGFURL))
 
-        # Non-persistent function loader, for speed
-        $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$env:gitProfile/contents/functions/!required"
-        $objects = $wr.Content | ConvertFrom-Json
-        $files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
-                
-        foreach ($file in $files) {
-            try {
-                Write-Verbose "Loading $file from $env:gitProfile"
-                invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-            }
-            catch {
-                throw "Unable to download '$($file.path)'"
-            }
-        }
         #env:LocalGitProfile means we're persisting a profile
         if ($env:LocalGitProfile) {
             
             #env:storageKey means we're persisting a cloudshell
             if ($env:storageKey) { 
-                $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root }
+                $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root 
+            }
 
             write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
@@ -84,24 +60,26 @@ switch ($global:isConnected) {
             #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -DestinationPath $here
             New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
             New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }
-            
-            . Import-LocalFunctions
-        }
-        else {
-            # Non-persistent function loader
-            ##$wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
-            ##$objects = $wr.Content | ConvertFrom-Json
-            ##$files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
 
-            ##foreach ($file in $files) {
-            ##    try {
-            ##       invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
-            ##  }
-            ##    catch {
-            ##        throw "Unable to download '$($file.path)'"
-            ##    }
-            ##}
-        }
+        }            
+        . global:Import-RequiredFunctions $env:gitProfile
+        . global:Import-LocalFunctions
+        
+        #else {
+        # Non-persistent function loader
+        ##$wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitOwner/$gitRepo/contents/functions/!required"
+        ##$objects = $wr.Content | ConvertFrom-Json
+        ##$files = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
+
+        ##foreach ($file in $files) {
+        ##    try {
+        ##       invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+        ##  }
+        ##    catch {
+        ##        throw "Unable to download '$($file.path)'"
+        ##    }
+        ##}
+        #}
     }
     $false {
         $here = (split-path -$env:LocalGitProfile).tostring()
