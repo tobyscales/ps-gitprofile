@@ -7,13 +7,13 @@ function global:Set-GitProfile {
 }
 function global:Get-GitProfile {
     param([Parameter( ValueFromPipeline = $true)]
-        [String[]]$gitProfileURL)
+        $gitProfileURL)
     
     return (New-Object System.Net.WebClient).DownloadString($gitProfileURL)
 }
 function global:Import-RequiredFunctions {
     param([Parameter( ValueFromPipeline = $true)]
-        $gitProfile)
+        [String[]]$gitProfile)
 
     # Load all !required functions
     $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/functions/!required"
