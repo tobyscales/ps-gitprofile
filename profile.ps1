@@ -77,9 +77,9 @@ function Import-GF {
     write-host "Importing $functionName from $url"
     #invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
     #$fDef = ((New-Object System.Net.WebClient).DownloadString($url))
-    $funcName = ($functionname.split('.')[0])
+    #$funcName = ($functionname.split('.')[0])
     #New-Item -Path Function:$funcName -Value $fDef -options AllScope
-    Invoke-Expression ((New-Object System.Net.WebClient).DownloadString($url))
+    return [scriptblock]::Create((New-Object System.Net.WebClient).DownloadString($url))
     #New-Item -Path Function:$funcName -Value $fDef -options AllScope
 }
 # function Get-GitProfile {
