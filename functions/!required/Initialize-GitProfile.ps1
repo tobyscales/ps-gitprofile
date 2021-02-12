@@ -30,9 +30,9 @@ function global:Uninstall-GitProfile {
                 Copy-Item $backupProfileName -destination $profile -Force
                 Copy-Item $backupPath -destination "$(split-path($profile))" -Force -Recurse -Exclude 'backup' -whatif
                 
-                Remove-Item -Path "$here\backup" -Recurse -Force -ErrorAction $continue
-                Remove-Item -Path "$here\functions" -Recurse -Force 
-                Remove-Item -Path "$here\scripts" -Recurse -Force 
+                Remove-Item -Path "$here\backup" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$here\functions" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$here\scripts" -Recurse -Force -ErrorAction SilentlyContinue
 
                 Remove-Item -Path $env:LocalGitProfile -force
             }
