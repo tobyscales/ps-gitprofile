@@ -9,11 +9,11 @@ function Update-GitProfile {
             (New-Object System.Net.WebClient).DownloadString("https://raw.githubusercontent.com/$gitProfile/master/Git.PowerShell_profile.ps1")
         )
         $global:isConnected = $true
-        Write-host -ForegroundColor Green "Running in online mode."
+        Write-host -ForegroundColor Green "Online mode."
     }
     catch { 
         $global:isConnected = $false
-        Write-Host -ForegroundColor Yellow "Running in offline mode."
+        Write-Host -ForegroundColor Yellow "Offline mode."
         if (-not $env:LocalGitProfile) {
             $sb = [scriptblock]::Create("Must be connected to run setup.") 
         }

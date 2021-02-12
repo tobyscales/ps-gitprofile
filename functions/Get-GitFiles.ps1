@@ -51,7 +51,7 @@ function Get-GitFiles {
         }
     } #no git installed; cribbed from https://en.terminalroot.com.br/how-to-clone-only-a-subdirectory-with-git-or-svn/
     else {
-        & cd $DestinationPath
+        & cd (split-path ($DestinationPath) -Parent)
         & git init
         & git remote add -f origin https://github.com/$Owner/$Repository
         & git config core.sparseCheckout true
