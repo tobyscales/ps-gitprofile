@@ -114,6 +114,9 @@ function global:Initialize-GitProfile {
                 }
 
                 #& "$home\.gitprofile\secrets.ps1" #using & instead of iex due to: https://paulcunningham.me/using-invoke-expression-with-spaces-in-paths/
+                . $profile
+                #& [scriptblock]::Create($envVars)
+
                 Get-GitProfile $gitProfileURL > $env:LocalGitProfile
                 . $env:LocalGitProfile
             }
