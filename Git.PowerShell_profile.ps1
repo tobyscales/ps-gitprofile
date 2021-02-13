@@ -50,10 +50,11 @@ if ($env:LocalGitProfile -and $isConnected) {
 
     . import-gitfunction get-gitfiles
     . import-gitfunction "New-Runspace" -GitProfile "pldmgg/misc-powershell" -subPath "MyFunctions/PowerShellCore_Compatible"
-    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "functions" -DestinationPath "$here\functions"
-    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "scripts" -DestinationPath "$here\scripts"
-    #New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
-    #New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
+    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "functions" -DestinationPath "$here\functions"
+    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "scripts" -DestinationPath "$here\scripts"
+    
+    New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
+    New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
 }
 
 
