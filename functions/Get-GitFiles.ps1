@@ -49,7 +49,7 @@ function Get-GitFiles {
                 throw "Unable to download '$($file.path)'"
             }
         }
-    } #no git installed; cribbed from https://en.terminalroot.com.br/how-to-clone-only-a-subdirectory-with-git-or-svn/
+    } # git is installed; clone subdirs cribbed from https://en.terminalroot.com.br/how-to-clone-only-a-subdirectory-with-git-or-svn/
     else {
         & cd (split-path ($DestinationPath) -Parent)
         & git init

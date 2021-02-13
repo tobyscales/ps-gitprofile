@@ -60,10 +60,12 @@ function global:Import-RequiredFunctions {
 function global:Import-GitFunction {
     Param(
         [string]$functionName,
-        [string]$gitProfile = $env:gitProfile
+        [string]$gitProfile = $env:gitProfile,
+        [string]$subPath = "functions"
     )
     if (-not $functionName.endswith(".ps1")) { $functionName += ".ps1" }
-    $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/functions"
+
+    $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/$subPath"
 
     $objects = $wr.Content | ConvertFrom-Json
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
