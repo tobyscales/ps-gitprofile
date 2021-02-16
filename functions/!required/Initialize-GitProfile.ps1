@@ -33,8 +33,9 @@ function global:Uninstall-GitProfile {
                 Remove-Item -Path "$here\backup" -Recurse -Force -ErrorAction SilentlyContinue
                 Remove-Item -Path "$here\functions" -Recurse -Force -ErrorAction SilentlyContinue
                 Remove-Item -Path "$here\scripts" -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -Path "$here\.git" -Recurse -Force -ErrorAction SilentlyContinue
 
-                Remove-Item -Path $env:LocalGitProfile -force
+                Remove-Item -Path $env:LocalGitProfile -force -ErrorAction SilentlyContinue
             }
             "N" {
                 write-host "Operation cancelled."

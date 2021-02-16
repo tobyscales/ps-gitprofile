@@ -8,12 +8,14 @@
 #>
 function Get-GitFiles {
     Param(
-        [string]$Owner,
-        [string]$Repository,
+        [string]$Owner = ($env:gitprofile).split('/')[0],
+        [string]$Repository = ($env:gitprofile).split('/')[1],
         [string]$Path,
         [string]$DestinationPath,
         [string]$ExcludePath = ""
     )
+
+    Write-Verbose "Loading $file from $owner/$repository..."
 
     if (-not (Test-Path $DestinationPath)) {
         # Destination path does not exist, let's create it
@@ -51,12 +53,17 @@ function Get-GitFiles {
         }
     } # git is installed; clone subdirs cribbed from https://en.terminalroot.com.br/how-to-clone-only-a-subdirectory-with-git-or-svn/
     else {
-        & cd (split-path ($DestinationPath) -Parent)
-        & git init
-        & git remote add -f origin https://github.com/$Owner/$Repository
-        & git config core.sparseCheckout true
-        & echo $Path >> .git/info/sparse-checkout
-        & echo $ExcludePath >> .git/info/sparse-checkout
-        & git pull origin master
+        if (test-path "(split-path ($DestinationPath) -Parent)/.git") {
+            & git pull origin master
+        }
+        else {
+            & cd (split-path ($DestinationPath) -Parent)
+            & git init
+            & git remote add -f origin https://github.com/$Owner/$Repository
+            & git config core.sparseCheckout true
+            & echo $Path >> .git/info/sparse-checkout
+            & echo $ExcludePath >> .git/info/sparse-checkout
+            & git pull origin master
+        }
     }
 }
