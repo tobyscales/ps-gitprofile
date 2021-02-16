@@ -26,7 +26,7 @@ Finally, for advanced users you can clone this repo and change the $env:gitProfi
 
 #TODO:
 * Add ability to update profile.ps1 after initial setup (version check for updater script)
-* Cleanup logic in Import-GitFunction to allow case mismatches
+* ~~Cleanup logic in Import-GitFunction to allow case mismatches~~
 * Add git support for 2-way sync
 * TO ADD: auto-import ARM snippets: https://danielpaulus.com/arm-templates-with-visual-studio-code/
 * TO ADD: auto-debug ARM tempaltes: https://azure.microsoft.com/en-us/blog/debugging-arm-template-deployments/
@@ -34,4 +34,4 @@ Finally, for advanced users you can clone this repo and change the $env:gitProfi
 * TODO: add "isAdmin" check for Linux root
 * Add MacOS support for Cloudshell
 * Add auto-detection of Cloudshell environment
-* add scriptblock logic for import-gitfunction to allow direct import (without dot-sourcing)
+* ~~add scriptblock logic for import-gitfunction to allow direct import (without dot-sourcing)~~ (doesn't seem this is possible)

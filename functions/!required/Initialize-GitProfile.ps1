@@ -110,4 +110,5 @@ function global:Initialize-GitProfile {
             default { $configureMachine = Read-Host "Please enter Y or N" }
         }
     }
+    
 }

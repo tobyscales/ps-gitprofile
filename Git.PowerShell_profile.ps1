@@ -38,7 +38,6 @@ switch ($true) {
 
 $gitOwner = split-path ($env:gitProfile)
 $gitRepo = split-path ($env:gitProfile) -leaf
-. global:Import-RequiredFunctions $env:gitProfile
 
 #env:LocalGitProfile means we're persisting a profile
 if ($env:LocalGitProfile -and $isConnected) {
@@ -49,14 +48,14 @@ if ($env:LocalGitProfile -and $isConnected) {
     write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
     . import-gitfunction get-gitfiles
-    . import-gitfunction "New-Runspace" -GitProfile "pldmgg/misc-powershell" -subPath "MyFunctions/PowerShellCore_Compatible"
-    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "functions" -DestinationPath "$here\functions"
-    #Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "scripts" -DestinationPath "$here\scripts"
+    #. import-gitfunction "New-Runspace" -GitProfile "pldmgg/misc-powershell" -subPath "MyFunctions/PowerShellCore_Compatible"
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "functions" -DestinationPath "$here\functions"
+    Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "scripts" -DestinationPath "$here\scripts"
     
-    New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
-    New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
+    #New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
+    #New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
 }
-
+. global:Import-RequiredFunctions $env:gitProfile
 
 #switch ($global:isConnected) {
 #    $true {
