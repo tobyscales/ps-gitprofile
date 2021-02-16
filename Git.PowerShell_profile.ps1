@@ -20,7 +20,6 @@ function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 $here = (split-path $profile)
 $isAdmin = $false
-$isTransient = $true
 
 #write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
 
@@ -39,8 +38,7 @@ switch ($true) {
 $gitOwner = split-path ($env:gitProfile)
 $gitRepo = split-path ($env:gitProfile) -leaf
 
-#env:LocalGitProfile means we're persisting a profile
-if ($env:LocalGitProfile -and $isConnected) {
+if (-not $isTransientProfile -and $isConnected) {
     #env:storageKey means we're mounting a cloudshell
     if ($env:storageKey) { 
         $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root 
@@ -55,7 +53,6 @@ if ($env:LocalGitProfile -and $isConnected) {
     #New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
     #New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
 }
-. global:Import-RequiredFunctions $env:gitProfile
 
 #switch ($global:isConnected) {
 #    $true {
