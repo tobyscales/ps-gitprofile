@@ -10,8 +10,8 @@ function Get-GitFiles {
     Param(
         [string]$Owner = ($env:gitprofile).split('/')[0],
         [string]$Repository = ($env:gitprofile).split('/')[1],
-        [string]$Path,
-        [string]$DestinationPath,
+        [Parameter(Mandatory = $true)][string]$Path,
+        [Parameter(Mandatory = $true)][string]$DestinationPath,
         [string]$ExcludePath = ""
     )
 
@@ -27,43 +27,45 @@ function Get-GitFiles {
         }
     }
 
-    if (-not (Get-Command -ErrorAction SilentlyContinue git)) {
-        $baseUri = "https://api.github.com/"
-        $paths = "repos/$Owner/$Repository/contents/$Path"
-        $wr = Invoke-WebRequest -Uri $($baseuri + $paths)
-        $objects = $wr.Content | ConvertFrom-Json
-        $files = $objects | Where-Object { $_.type -eq "file" } | Select-Object -exp download_url
-        $directories = $objects | Where-Object { $_.type -eq "dir" }
+    $baseUri = "https://api.github.com/"
+    $paths = "repos/$Owner/$Repository/contents/$Path"
+    $wr = Invoke-WebRequest -Uri $($baseuri + $paths)
+    $objects = $wr.Content | ConvertFrom-Json
+    $files = $objects | Where-Object { $_.type -eq "file" } | Select-Object -exp download_url
+    $directories = $objects | Where-Object { $_.type -eq "dir" }
         
-        $directories | ForEach-Object { 
-            #if ($_.name -ne $ExcludePath) {
-            Get-GitFiles -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath (join-path $DestinationPath -childpath $_.name)
-            #}
-        }
+    $directories | ForEach-Object { 
+        #if ($_.name -ne $ExcludePath) {
+        Get-GitFiles -Owner $Owner -Repository $Repository -Path $_.path -DestinationPath (join-path $DestinationPath -childpath $_.name)
+        #}
+    }
     
-        foreach ($file in $files) {
-            $fileDestination = Join-Path $DestinationPath (Split-Path $file -Leaf)
-            try {
-                write-verbose "Saving file $file to $fileDestination..."
-                Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop 
-            }
-            catch {
-                throw "Unable to download '$($file.path)'"
-            }
+    foreach ($file in $files) {
+        $fileDestination = Join-Path $DestinationPath (Split-Path $file -Leaf)
+        try {
+            write-verbose "Saving file $file to $fileDestination..."
+            Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop 
         }
-    } # git is installed; clone subdirs cribbed from https://en.terminalroot.com.br/how-to-clone-only-a-subdirectory-with-git-or-svn/
-    else {
-        if (test-path "(split-path ($DestinationPath) -Parent)/.git") {
-            & git pull origin master
-        }
-        else {
-            & cd (split-path ($DestinationPath) -Parent)
-            & git init
-            & git remote add -f origin https://github.com/$Owner/$Repository
-            & git config core.sparseCheckout true
-            & echo $Path >> .git/info/sparse-checkout
-            & echo $ExcludePath >> .git/info/sparse-checkout
-            & git pull origin master
+        catch {
+            throw "Unable to download '$($file.path)'"
         }
     }
+    #future use
+    if (Get-Command -ErrorAction SilentlyContinue git) { $global:gitInstalled = $true }
+
+    #git clone subdirs cribbed from https://en.terminalroot.com.br/how-to-clone-only-a-subdirectory-with-git-or-svn/
+    #if ($global:gitInstalled) { 
+    #     if (test-path "(split-path ($DestinationPath) -Parent)/.git") {
+    #         & git pull origin master
+    #     }
+    #     else {
+    #         & cd (split-path ($DestinationPath) -Parent)
+    #         & git init
+    #         & git remote add -f origin https://github.com/$Owner/$Repository
+    #         & git config core.sparseCheckout true
+    #         & echo $Path >> .git/info/sparse-checkout
+    #         & echo $ExcludePath >> .git/info/sparse-checkout
+    #         & git pull origin master
+    #     }
+    #} else {
 }

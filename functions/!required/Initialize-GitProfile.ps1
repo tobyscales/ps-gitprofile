@@ -1,4 +1,3 @@
-
 function global:Backup-CurrentProfile {
     $backupPath = join-path (split-path $profile) "backup"
     $backupProfileName = (split-path -leaf $profile)
