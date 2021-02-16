@@ -16,7 +16,7 @@ function Update-GitProfile {
     catch { 
         $global:isConnected = $false
         Write-Host -ForegroundColor Yellow "Offline mode."
-        if (test-path($env:LocalGitProfile)) {
+        if (-not ($env:LocalGitProfile)) {
             $sb = [scriptblock]::Create(
                 [io.file]::ReadAllText($env:LocalGitProfile)
             )            
