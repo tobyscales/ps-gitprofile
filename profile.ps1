@@ -1,5 +1,5 @@
-if (-not (test-path($env:gitProfile))) { $env:gitProfile = "tobyscales/ps-gitprofile" }
-if (-not (test-path($env:localGitProfile))) { $global:isTransientProfile = $true }
+if (-not ($env:gitProfile)) { $env:gitProfile = "tobyscales/ps-gitprofile" }
+if (-not ($env:localGitProfile)) { $global:isTransientProfile = $true }
 
 function Update-GitProfile {
     param([Parameter(ValueFromPipeline = $true)]

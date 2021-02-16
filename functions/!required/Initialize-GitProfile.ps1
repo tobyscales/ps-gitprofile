@@ -100,7 +100,7 @@ function global:Initialize-GitProfile {
 
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
                 $envVars.GetEnumerator() | ForEach-Object {
-                    "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value | out-file "$profile" -Append -Force
+                    "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value + '\n' + (get-content $profile) | set-content "$profile" -Force
                 }
 
                 (New-Object System.Net.WebClient).DownloadString($gitProfileURL) > $env:LocalGitProfile
