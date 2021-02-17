@@ -70,6 +70,7 @@ function global:Import-GitFunction {
     )
     if (-not $functionName.endswith(".ps1")) { $functionName += ".ps1" }
 
+    #add test-local logic to import-gitfunction, a la if (test-path "$here\functions\get-gitfiles.ps1") { }
     $wr = Invoke-WebRequest -usebasicparsing -Uri "https://api.github.com/repos/$gitProfile/contents/$subPath"
     $objects = $wr.Content | ConvertFrom-Json
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url

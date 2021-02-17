@@ -43,6 +43,7 @@ if (-not $isTransientProfile -and $isConnected) {
     if ($env:storageKey) { 
         $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root 
     }
+    #add test-local logic to import-gitfunction, a la if (test-path "$here\functions\get-gitfiles.ps1") { }
     . import-gitfunction get-gitfiles
     write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
