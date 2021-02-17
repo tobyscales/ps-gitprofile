@@ -44,8 +44,7 @@ function global:Import-RequiredFunctions {
                     Write-Host "Loading " -NoNewline -ForegroundColor Green
                     write-host "$($url.split('/')[-1])" -NoNewline -ForegroundColor White
                     write-host " from " -ForegroundColor Green -NoNewLine
-                    write-host $gitProfile -ForegroundColor White -NoNewLine
-                    write-host "..." -ForegroundColor Green
+                    write-host "$gitProfile..." -ForegroundColor White
                     Write-Verbose "Running online, so loading $url from $gitProfile"
                     (New-Object System.Net.WebClient).DownloadString("$url") | Invoke-Expression
                 }
