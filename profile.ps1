@@ -43,11 +43,11 @@ function global:Import-RequiredFunctions {
                 try {
                     Write-Host "Loading " -NoNewline -ForegroundColor Green
                     write-host "$($url.split('/')[-1])" -NoNewline -ForegroundColor White
-                    write-host " from $gitProfile..." -ForegroundColor Green
+                    write-host " from " -ForegroundColor Green -NoNewLine
+                    write-host $gitProfile -ForegroundColor White -NoNewLine
+                    write-host "..." -ForegroundColor Green
                     Write-Verbose "Running online, so loading $url from $gitProfile"
-                    . (
-                        [scriptblock]::Create( (New-Object System.Net.WebClient).DownloadString("$url") )
-                    )
+                    (New-Object System.Net.WebClient).DownloadString("$url") | Invoke-Expression
                 }
                 catch {
                     throw "Unable to download '$($url.path)'"
