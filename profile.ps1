@@ -35,7 +35,7 @@ function global:Import-RequiredFunctions {
     switch ($useOnlineOnly) {
         $true {
             # no profile stored, so load !required functions from github
-            $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/functions/!required"
+            $wr = Invoke-WebRequest -usebasicparsing -Uri "https://api.github.com/repos/$gitProfile/contents/functions/!required"
             $objects = $wr.Content | ConvertFrom-Json
             $urls = $objects | where-object { $_.type -eq "file" } | Select-object -exp download_url
                     
@@ -74,7 +74,7 @@ function global:Import-GitFunction {
     )
     if (-not $functionName.endswith(".ps1")) { $functionName += ".ps1" }
 
-    $wr = Invoke-WebRequest -Uri "https://api.github.com/repos/$gitProfile/contents/$subPath"
+    $wr = Invoke-WebRequest -usebasicparsing -Uri "https://api.github.com/repos/$gitProfile/contents/$subPath"
     $objects = $wr.Content | ConvertFrom-Json
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
 
