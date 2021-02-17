@@ -41,7 +41,7 @@ function global:Import-RequiredFunctions {
             foreach ($url in $urls) {
                 try {
                     Write-Host "Loading " -NoNewline -ForegroundColor Green
-                    write-host "$($url.split('/')[-1])" -NoNewline -ForegroundColor White
+                    write-host "$($url.split('/')[-1])" -ForegroundColor White
                     #write-host " from " -ForegroundColor Green -NoNewLine
                     #write-host "$gitProfile..." -ForegroundColor White
                     Write-Verbose "Loading $url from $gitProfile"
