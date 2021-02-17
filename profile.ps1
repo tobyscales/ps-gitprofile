@@ -32,8 +32,7 @@ function global:Import-RequiredFunctions {
 
     $gitProfile = $env:gitProfile
 
-    switch ($useOnlineOnly) {
-        $true {
+    if ($useOnlineOnly) {
             # no profile stored, so load !required functions from github
             $wr = Invoke-WebRequest -usebasicparsing -Uri "https://api.github.com/repos/$gitProfile/contents/functions/!required"
             $objects = $wr.Content | ConvertFrom-Json
@@ -46,14 +45,13 @@ function global:Import-RequiredFunctions {
                     write-host " from " -ForegroundColor Green -NoNewLine
                     write-host "$gitProfile..." -ForegroundColor White
                     Write-Verbose "Running online, so loading $url from $gitProfile"
-                    (New-Object System.Net.WebClient).DownloadString("$url") | Invoke-Expression
+                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
                 }
                 catch {
                     throw "Unable to download '$($url.path)'"
                 }
             }
-        }
-        $false {
+        } else {
             $functionpath = (join-path $here -childpath "functions")
             foreach ($file in Get-ChildItem (join-path $functionpath *.ps1) -recurse) {
                 . (
@@ -63,7 +61,6 @@ function global:Import-RequiredFunctions {
                 )
             }
         } 
-    }
 }
 function global:Import-GitFunction {
     Param(
