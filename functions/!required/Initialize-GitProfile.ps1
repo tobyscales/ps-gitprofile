@@ -98,7 +98,7 @@ function global:Initialize-GitProfile {
                     }
                 }
                 $savedProfile=Get-Content $profile
-                Clear-Content $profile
+                "saved Profile" > $profile
                 write-host "saved $savedProfile"
                 Start-Sleep 15
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
