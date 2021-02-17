@@ -41,7 +41,9 @@ function global:Import-RequiredFunctions {
                     
             foreach ($url in $urls) {
                 try {
-                    Write-Host "Loading $($url.split('/')[-1]) from $gitProfile..."
+                    Write-Host "Loading " -NoNewline -ForegroundColor Green
+                    write-host "$($url.split('/')[-1])" -NoNewline -ForegroundColor White
+                    write-host " from $gitProfile..." -ForegroundColor Green
                     Write-Verbose "Running online, so loading $url from $gitProfile"
                     . (
                         [scriptblock]::Create( (New-Object System.Net.WebClient).DownloadString("$url") )
