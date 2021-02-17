@@ -82,6 +82,6 @@ function global:Import-GitFunction {
     (New-Object System.Net.WebClient).DownloadString($url) | Invoke-Expression 
 }
 . ( Update-GitProfile )                                 #executes Git.Powershell_Profile from GH or from local cache, if installed and offline
-Import-RequiredFunctions $isTransientProfile            #imports !required functions from GH (transient) or all /functions from local cache (installed)
+global:Import-RequiredFunctions $isTransientProfile            #imports !required functions from GH (transient) or all /functions from local cache (installed)
 Set-Alias igf global:Import-GitFunction                 #enables alias for easy importing of functions from a GH profile
 
