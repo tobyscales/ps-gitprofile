@@ -97,12 +97,14 @@ function global:Initialize-GitProfile {
                         default { $useCloudShell = Read-Host "Please enter Y or N" }
                     }
                 }
-
+                $savedProfile=Get-Content $profile
+                Clear-Content $profile
+                
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
                 $envVars.GetEnumerator() | ForEach-Object {
-                    "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value + '\n' + (get-content $profile) | set-content "$profile" -Force
+                    "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value + '\n' >> $profile
                 }
-
+                $savedProfile >> $profile
                 (New-Object System.Net.WebClient).DownloadString($gitProfileURL) > $env:LocalGitProfile
                 . $env:LocalGitProfile
             }

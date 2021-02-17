@@ -1,4 +1,4 @@
-if (-not ($env:gitProfile)) { $env:gitProfile = "tobyscales/ps-gitprofile" }
+if (-not ($env:gitProfile)) { $env:gitProfile = "tobyscales/ps-gitprofile" } ##TODO: fix up use of env vars, use global where appropriate
 if (-not ($env:localGitProfile)) { $global:isTransientProfile = $true }
 
 function Update-GitProfile {
@@ -41,10 +41,10 @@ function global:Import-RequiredFunctions {
             foreach ($url in $urls) {
                 try {
                     Write-Host "Loading " -NoNewline -ForegroundColor Green
-                    write-host "$($url.split('/')[-1])" -NoNewline -ForegroundColor White
-                    write-host " from " -ForegroundColor Green -NoNewLine
+                    #write-host "$($url.split('/')[-1])" -NoNewline -ForegroundColor White
+                    #write-host " from " -ForegroundColor Green -NoNewLine
                     write-host "$gitProfile..." -ForegroundColor White
-                    Write-Verbose "Running online, so loading $url from $gitProfile"
+                    Write-Verbose "Loading $url from $gitProfile"
                     invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
                 }
                 catch {
@@ -78,6 +78,6 @@ function global:Import-GitFunction {
     (New-Object System.Net.WebClient).DownloadString($url) | Invoke-Expression 
 }
 . ( Update-GitProfile )                                 #executes Git.Powershell_Profile from GH or from local cache, if installed and offline
-global:Import-RequiredFunctions $isTransientProfile            #imports !required functions from GH (transient) or all /functions from local cache (installed)
+. Import-RequiredFunctions $isTransientProfile          #imports !required functions from GH (transient) or all /functions from local cache (installed)
 Set-Alias igf global:Import-GitFunction                 #enables alias for easy importing of functions from a GH profile
 
