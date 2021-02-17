@@ -29,7 +29,7 @@ function Get-GitFiles {
 
     $baseUri = "https://api.github.com/"
     $paths = "repos/$Owner/$Repository/contents/$Path"
-    $wr = Invoke-WebRequest -Uri $($baseuri + $paths)
+    $wr = Invoke-WebRequest -usebasicparsing -Uri $($baseuri + $paths)
     $objects = $wr.Content | ConvertFrom-Json
     $files = $objects | Where-Object { $_.type -eq "file" } | Select-Object -exp download_url
     $directories = $objects | Where-Object { $_.type -eq "dir" }
@@ -46,7 +46,7 @@ function Get-GitFiles {
         else {
             try {
                 write-verbose "Saving file $file to $fileDestination..."
-                Invoke-WebRequest -Uri $file -OutFile $fileDestination -ErrorAction Stop 
+                Invoke-WebRequest -usebasicparsing -Uri $file -OutFile $fileDestination -ErrorAction Stop 
             }
             catch {
                 throw "Unable to download '$($file.path)'"

@@ -74,7 +74,10 @@ function global:Import-GitFunction {
     $objects = $wr.Content | ConvertFrom-Json
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
 
-    write-host "Importing $functionName from $url"
+    Write-Host "Loading " -NoNewline -ForegroundColor Green
+    write-host "$functionName" -ForegroundColor White -NoNewline
+    write-host " from " -ForegroundColor Green -NoNewline
+    write-host "$gitProfile" -ForegroundColor white
     (New-Object System.Net.WebClient).DownloadString($url) | Invoke-Expression 
 }
 . ( Update-GitProfile )                                 #executes Git.Powershell_Profile from GH or from local cache, if installed and offline

@@ -43,9 +43,9 @@ if (-not $isTransientProfile -and $isConnected) {
     if ($env:storageKey) { 
         $cloudShell = (Mount-CloudShellDrive -storageAcct $env:storagePath.split('.')[0] -storageKey $env:storageKey -shareName $env:storagePath.split('\')[-1] ); write-host "Mapped Cloud drive to $($cloudShell.Root)"; set-location $cloudShell.Root 
     }
+    . import-gitfunction get-gitfiles
     write-host -ForegroundColor yellow "Cloning functions from $gitRepo..."
 
-    . import-gitfunction get-gitfiles
     #. import-gitfunction "New-Runspace" -GitProfile "pldmgg/misc-powershell" -subPath "MyFunctions/PowerShellCore_Compatible"
     Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "functions" -DestinationPath "$here\functions"
     Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "scripts" -DestinationPath "$here\scripts"

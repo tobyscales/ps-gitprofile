@@ -106,7 +106,7 @@ function global:Initialize-GitProfile {
                 }
                 $savedProfile >> $profile
                 (New-Object System.Net.WebClient).DownloadString($gitProfileURL) > $env:LocalGitProfile
-                . $env:LocalGitProfile
+                . $profile
             }
             "N" { }
             default { $configureMachine = Read-Host "Please enter Y or N" }
