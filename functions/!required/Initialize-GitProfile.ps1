@@ -26,7 +26,7 @@ function global:Uninstall-GitProfile {
         $removeAll = Read-Host "This will restore your profile $backupProfileName and all files from $backupPath.`nIt will also remove all objects in these directories: `n-->$functionPath `n-->$scriptPath`n`nOK to proceed?"
         switch ($removeAll.toUpper()) {
             "Y" {
-                Copy-Item $backupProfileName -destination $profile -Force
+                Copy-Item $backupProfileName -destination $profile -Force -ErrorAction SilentlyContinue
                 Copy-Item $backupPath -destination "$(split-path($profile))" -Force -Recurse -Exclude 'backup' -whatif
                 
                 Remove-Item -Path "$here\backup" -Recurse -Force -ErrorAction SilentlyContinue
@@ -106,6 +106,7 @@ function global:Initialize-GitProfile {
                 }
                 $savedProfile >> $profile
                 (New-Object System.Net.WebClient).DownloadString($gitProfileURL) > $env:LocalGitProfile
+                $global:isTransientProfile=$false
                 . $profile
             }
             "N" { }

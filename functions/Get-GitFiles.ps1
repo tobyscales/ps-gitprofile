@@ -45,7 +45,7 @@ function Get-GitFiles {
         if (test-path $fileDestination) { continue }
         else {
             try {
-                write-verbose "Saving file $file to $fileDestination..."
+                write-host "Saving file $file to $fileDestination..."
                 Invoke-WebRequest -usebasicparsing -Uri $file -OutFile $fileDestination -ErrorAction Stop 
             }
             catch {

@@ -40,10 +40,10 @@ function global:Import-RequiredFunctions {
                     
             foreach ($url in $urls) {
                 try {
-                    Write-Host "Loading " -NoNewline -ForegroundColor Green
+                    Write-Host "Loading " -NoNewline -ForegroundColor Yellow
                     write-host "$($url.split('/')[-1])" -ForegroundColor White
-                    #write-host " from " -ForegroundColor Green -NoNewLine
-                    #write-host "$gitProfile..." -ForegroundColor White
+                    write-host " from " -ForegroundColor Yellow -NoNewLine
+                    write-host "$gitProfile..." -ForegroundColor White
                     Write-Verbose "Loading $url from $gitProfile"
                     invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
                 }
@@ -74,9 +74,9 @@ function global:Import-GitFunction {
     $objects = $wr.Content | ConvertFrom-Json
     $url = $objects | where-object { $_.type -eq "file" -and $_.name.toUpper() -eq $functionName.toUpper() } | Select-object -exp download_url
 
-    Write-Host "Loading " -NoNewline -ForegroundColor Green
+    Write-Host "Loading " -NoNewline -ForegroundColor Yellow
     write-host "$functionName" -ForegroundColor White -NoNewline
-    write-host " from " -ForegroundColor Green -NoNewline
+    write-host " from " -ForegroundColor Yellow -NoNewline
     write-host "$gitProfile" -ForegroundColor white
     (New-Object System.Net.WebClient).DownloadString($url) | Invoke-Expression 
 }

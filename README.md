@@ -28,10 +28,11 @@ Finally, for advanced users you can clone this repo and change the $env:gitProfi
 * Add ability to update profile.ps1 after initial setup (version check for updater script)
 * ~~Cleanup logic in Import-GitFunction to allow case mismatches~~
 * Add git support for 2-way sync
+* TODO: add "isAdmin" check for Mac/Linux root
+* Add MacOS support for Cloudshell
+* Add auto-detection of Cloudshell environment
+* Add case-insensitivity to Get-GitFiles
 * TO ADD: auto-import ARM snippets: https://danielpaulus.com/arm-templates-with-visual-studio-code/
 * TO ADD: auto-debug ARM tempaltes: https://azure.microsoft.com/en-us/blog/debugging-arm-template-deployments/
 * TO ADD: CSS-styling for GH Markdown: https://gist.github.com/JamesMessinger/5d31c053d0b1d52389eb2723f7550907
-* TODO: add "isAdmin" check for Linux root
-* Add MacOS support for Cloudshell
-* Add auto-detection of Cloudshell environment
 * ~~add scriptblock logic for import-gitfunction to allow direct import (without dot-sourcing)~~ (doesn't seem this is possible)
