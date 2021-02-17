@@ -42,7 +42,9 @@ function global:Import-RequiredFunctions {
             foreach ($url in $urls) {
                 try {
                     Write-Host "Loading $url from $gitProfile"
-                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
+                    . (
+                        [scriptblock]::Create( (New-Object System.Net.WebClient).DownloadString("$url") )
+                    )
                 }
                 catch {
                     throw "Unable to download '$($url.path)'"
@@ -77,6 +79,6 @@ function global:Import-GitFunction {
     (New-Object System.Net.WebClient).DownloadString($url) | Invoke-Expression 
 }
 . ( Update-GitProfile )                                 #executes Git.Powershell_Profile from GH or from local cache, if installed and offline
-Import-RequiredFunctions $global:isTransientProfile     #imports !required functions from GH (transient) or all /functions from local cache, if installed
+Import-RequiredFunctions $isTransientProfile            #imports !required functions from GH (transient) or all /functions from local cache (installed)
 Set-Alias igf global:Import-GitFunction                 #enables alias for easy importing of functions from a GH profile
 
