@@ -29,8 +29,9 @@ function Update-GitProfile {
 }
 function global:Import-RequiredFunctions {
     param([Parameter( ValueFromPipeline = $true)]$useOnlineOnly)
+
     $gitProfile = $env:gitProfile
-    
+
     switch ($useOnlineOnly) {
         $true {
             # no profile stored, so load !required functions from github
@@ -40,11 +41,11 @@ function global:Import-RequiredFunctions {
                     
             foreach ($url in $urls) {
                 try {
-                    Write-Verbose "Loading $file from $env:gitProfile"
-                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($file)) -ErrorAction Stop
+                    Write-Host "Loading $url from $gitProfile"
+                    invoke-expression ((New-Object System.Net.WebClient).DownloadString($url)) -ErrorAction Stop
                 }
                 catch {
-                    throw "Unable to download '$($file.path)'"
+                    throw "Unable to download '$($url.path)'"
                 }
             }
         }
