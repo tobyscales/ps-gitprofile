@@ -18,7 +18,7 @@ To make ps-gitprofile your default profile, run the above command then
 Initialize-GitProfile 
 ```
 
-This will also give you the option to automount your Azure Cloud Shell drive on every execution. In order to do that, you'll need the following information (which will then be stored in PLAINTEXT in $home/.gitprofile -- you've been warned!)
+This will also give you the option to automount your Azure Cloud Shell drive on every execution. In order to do that, you'll need the following information (which will then be stored in PLAINTEXT in your PowerShell $profile -- you've been warned!)
  * Azure Cloud Shell Storage Account Name & Shared Folder Name
  * Azure Cloud Shell Storage Account Key
 

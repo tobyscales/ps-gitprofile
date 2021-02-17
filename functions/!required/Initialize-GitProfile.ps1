@@ -35,6 +35,7 @@ function global:Uninstall-GitProfile {
                 Remove-Item -Path "$here\.git" -Recurse -Force -ErrorAction SilentlyContinue
 
                 Remove-Item -Path $env:LocalGitProfile -force -ErrorAction SilentlyContinue
+                Write-Host "Uninstall Complete." -ForegroundColor White
             }
             "N" {
                 write-host "Operation cancelled."
