@@ -29,7 +29,8 @@ function Update-GitProfile {
 }
 function global:Import-RequiredFunctions {
     param([Parameter( ValueFromPipeline = $true)]$useOnlineOnly)
-
+    $gitProfile = $env:gitProfile
+    
     switch ($useOnlineOnly) {
         $true {
             # no profile stored, so load !required functions from github
