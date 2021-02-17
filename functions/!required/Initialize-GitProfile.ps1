@@ -99,7 +99,8 @@ function global:Initialize-GitProfile {
                 }
                 $savedProfile=Get-Content $profile
                 Clear-Content $profile
-                
+                write-host "saved $savedProfile"
+                Start-Sleep 15
                 $columnWidth = $envVars.Keys.length | Sort-Object | Select-Object -Last 1
                 $envVars.GetEnumerator() | ForEach-Object {
                     "{0,-$columnWidth}=`"{1}`"" -F $_.Key, $_.Value + '\n' >> $profile
