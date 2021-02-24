@@ -26,6 +26,7 @@ $isAdmin = $false
 switch ($true) {
     $isWindows {
         $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+        ([System.Security.Principal.WindowsIdentity]::GetCurrent().UserClaims | Where-Object { $_.Value -eq 'S-1-5-32-544'})
     }
     $isLinux { 
         #TODO: $isAdmin = something;
@@ -50,6 +51,8 @@ if (-not $isTransientProfile -and $isConnected) {
     #. import-gitfunction "New-Runspace" -GitProfile "pldmgg/misc-powershell" -subPath "MyFunctions/PowerShellCore_Compatible"
     . Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "functions" -DestinationPath "$here\functions"
     . Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path "Scripts" -DestinationPath "$here\scripts"
+    #. Get-GitFiles -owner "Lukesampson" -Repository "psutils" -Path "sudo.ps1" -DestinationPath "$here\functions"
+    #. Get-GitFiles -Owner "noseratio" -Repository "choco" -Path "wsudo/bin/wsudoexec.ps1" -DestinationPath "$here\functions"
     
     #New-Runspace -runspacename "PS Clone Functions" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path functions -DestinationPath "$here\functions" }
     #New-Runspace -runspacename "PS Clone Scripts" -scriptblock { Get-GitFiles -Owner $gitOwner -Repository $gitRepo -Path Scripts -DestinationPath "$here\scripts" }       
