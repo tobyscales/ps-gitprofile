@@ -26,7 +26,6 @@ $isAdmin = $false
 switch ($true) {
     $isWindows {
         $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-        ([System.Security.Principal.WindowsIdentity]::GetCurrent().UserClaims | Where-Object { $_.Value -eq 'S-1-5-32-544'})
     }
     $isLinux { 
         #TODO: $isAdmin = something;
