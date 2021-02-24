@@ -25,13 +25,14 @@ This will also give you the option to automount your Azure Cloud Shell drive on 
 Finally, for advanced users you can clone this repo and change the $env:gitProfile variable at the top of profile.ps1 to point all the defaults to your repository instead. 
 
 #TODO:
-* Add ability to update profile.ps1 after initial setup (version check for updater script)
 * ~~Cleanup logic in Import-GitFunction to allow case mismatches~~
+* ~~Add "isAdmin" check for Mac/Linux root~~
+* Add case-insensitivity to Get-GitFiles
+* Add ability to update profile.ps1 after initial setup (version check for updater script)
+* Refactor with Environment:: instead of $env: per https://powershell.org/2019/02/tips-for-writing-cross-platform-powershell-code/
 * Add git support for 2-way sync
-* TODO: add "isAdmin" check for Mac/Linux root
 * Add MacOS support for Cloudshell
 * Add auto-detection of Cloudshell environment
-* Add case-insensitivity to Get-GitFiles
 * TO ADD: auto-import ARM snippets: https://danielpaulus.com/arm-templates-with-visual-studio-code/
 * TO ADD: auto-debug ARM tempaltes: https://azure.microsoft.com/en-us/blog/debugging-arm-template-deployments/
 * TO ADD: CSS-styling for GH Markdown: https://gist.github.com/JamesMessinger/5d31c053d0b1d52389eb2723f7550907

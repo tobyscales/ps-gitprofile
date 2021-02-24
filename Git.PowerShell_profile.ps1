@@ -23,17 +23,23 @@ $isAdmin = $false
 
 #write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
 
-switch ($true) {
-    $isWindows {
-        $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
-    }
-    $isLinux { 
-        #TODO: $isAdmin = something;
-    }
-    $isMacOS { 
-        #TODO: $isAdmin = something;
-    }
-} 
+#region platform-specific configurations
+if ( -not (Test-Variable 'variable:IsWindows') ) { $isWindows = $true } ##for WinPS-5.1 compatibility
+
+    switch ($true) {
+        $isWindows {
+            $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")
+            $env:HOME = $env:USERPROFILE
+        }
+        $isLinux { 
+            $isAdmin = ((id -u) -eq 0)
+        }
+        $isMacOS { 
+            $isAdmin = ((id -u) -eq 0)
+        }
+    } 
+
+#endregion platform-specific
 
 $gitOwner = split-path ($env:gitProfile)
 $gitRepo = split-path ($env:gitProfile) -leaf
@@ -83,7 +89,7 @@ if (-not $isTransientProfile -and $isConnected) {
 #}
 #}
 #$false { #not connected
- #   $here = (split-path -$env:LocalGitProfile).tostring()
+#   $here = (split-path -$env:LocalGitProfile).tostring()
 #}
 #}
 
