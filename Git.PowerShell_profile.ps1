@@ -24,7 +24,7 @@ $isAdmin = $false
 #write-verbose "Loading $env:LocalGitProfile from $($MyInvocation.InvocationName)"
 
 #region platform-specific configurations
-if ( -not (Test-Variable 'variable:IsWindows') ) { $isWindows = $true } ##for WinPS-5.1 compatibility
+if ( -not (Test-Path 'variable:IsWindows') ) { $isWindows = $true } ##for WinPS-5.1 compatibility
 
     switch ($true) {
         $isWindows {
