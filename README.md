@@ -4,7 +4,7 @@ Automagically sync your PowerShell profile across Linux, Windows and Azure Cloud
 To run at your current PowerShell6 prompt, simply type: 
 
 ```
-iwr aka.ms/psgp | iex
+iwr is.gd/psgit | iex
 ```
 
 This will give you the [default profile](https://github.com/tescales/ps-gitprofile/blob/master/Git.PowerShell_profile.ps1) and pre-load the functions in the [!required](https://github.com/tescales/ps-gitprofile/tree/master/functions/!required) folder.
